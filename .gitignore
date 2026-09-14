@@ -1,0 +1,12 @@
+# Logs
+*.log
+chrome_modal.log
+
+# Temporary test screenshots
+screenshot*.png
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

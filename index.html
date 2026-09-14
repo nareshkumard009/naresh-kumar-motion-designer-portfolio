@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Naresh Kumar — Video Editor &amp; Motion Designer</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description"
+    content="Portfolio of Naresh Kumar, a Video Editor &amp; Motion Designer creating engaging short-form, long-form and branded video content." />
+  <meta name="author" content="Naresh Kumar" />
+  <meta name="keywords"
+    content="Video Editor, Motion Designer, Hyderabad, Freelance Video Editor, Reels Editor, YouTube Editor, Motion Graphics, DaVinci Resolve, Premiere Pro, After Effects" />
+
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Naresh Kumar — Video Editor &amp; Motion Designer" />
+  <meta property="og:description"
+    content="Portfolio of Naresh Kumar, a Video Editor &amp; Motion Designer creating engaging short-form, long-form and branded video content." />
+  <meta property="og:image" content="public/thumbnails/placeholder-long.svg" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Naresh Kumar — Video Editor &amp; Motion Designer" />
+  <meta name="twitter:description"
+    content="Portfolio of Naresh Kumar, a Video Editor &amp; Motion Designer creating engaging short-form, long-form and branded video content." />
+
+  <!-- Favicon / Theme -->
+  <meta name="theme-color" content="#0a0b0e" />
+
+  <!-- Preload Styles & Scripts -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+  <!-- =========================================================================
+       NAVIGATION BAR
+       ========================================================================= -->
+  <header class="navbar" role="banner">
+    <div class="container nav-container">
+      <a href="#hero" class="nav-brand" aria-label="Naresh Kumar Home">
+        <span class="brand-name">Naresh Kumar</span>
+        <span class="status-indicator">
+          <span class="status-dot"></span>
+          <span>Available</span>
+        </span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Primary Navigation">
+        <ul class="nav-links">
+          <li><a href="#hero" class="nav-link active">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#brands" class="nav-link">Brands</a></li>
+          <li><a href="#work" class="nav-link">Work</a></li>
+          <li><a href="#raw-final" class="nav-link">RAW → FINAL</a></li>
+          <li><a href="#feedback" class="nav-link">Feedback</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Nav CTA -->
+      <div class="nav-cta">
+        <a href="https://wa.me/919177421780?text=Hi%20Naresh%2C%20I%20came%20across%20your%20portfolio%20and%20would%20like%20to%20discuss%20a%20project!"
+          target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Chat now</a>
+        <button class="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-drawer" aria-label="Mobile Navigation">
+      <a href="#hero" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#brands" class="nav-link">Brands</a>
+      <a href="#work" class="nav-link">Work</a>
+      <a href="#raw-final" class="nav-link">RAW → FINAL</a>
+      <a href="#feedback" class="nav-link">Feedback</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <a href="https://wa.me/919177421780?text=Hi%20Naresh%2C%20I%20came%20across%20your%20portfolio%20and%20would%20like%20to%20discuss%20a%20project!"
+        target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="margin-top: 12px;">Chat now</a>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- =======================================================================
+         1. HERO SECTION
+         ======================================================================= -->
+    <section id="hero" class="hero-section">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-meta">
+            <span>Video Editor</span>
+            <span>•</span>
+            <span>Motion Designer</span>
+            <span>•</span>
+            <span>Hyderabad, India</span>
+          </div>
+
+          <h1 class="hero-headline">
+            Video Editor<br />
+            &amp; Motion Designer
+          </h1>
+
+          <p class="hero-subtext">
+            I turn footage, ideas and concepts into engaging visual stories.
+          </p>
+        </div>
+
+        <!-- Dominant Cinematic Showreel Player -->
+        <div class="showreel-wrapper">
+          <div class="showreel-frame" id="showreel-frame" role="region" aria-label="Naresh Kumar Showreel">
+            <!-- Native Showreel Video (Paused with Poster Thumbnail) -->
+            <video id="showreel-video" class="showreel-video" muted loop playsinline preload="auto" poster="public/thumbnails/showreel-poster.jpg"
+              disablePictureInPicture disableRemotePlayback>
+              <source src="public/videos/showreel.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            <!-- Center Big Play Button Overlay (shown when paused) -->
+            <button class="showreel-big-play" id="showreel-big-play" aria-label="Play showreel">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 4 20 12 6 20 6 4" />
+              </svg>
+            </button>
+
+            <!-- Top Meta Badges matching portfolio cards -->
+            <div class="card-meta-top">
+              <span class="card-badge">SHOWREEL • 4K MASTER</span>
+              <span class="card-duration">01:30</span>
+            </div>
+
+            <!-- Minimal Video Controls Overlay (Play/Pause, Sound, Timeline Scroller, Fullscreen) -->
+            <div class="card-video-controls" id="showreel-controls" aria-label="Showreel Video Controls">
+              <div class="ctrl-btn-group">
+                <!-- Play / Pause -->
+                <button class="video-ctrl-btn ctrl-play" id="showreel-ctrl-play" aria-label="Play showreel" title="Play / Pause">
+                  <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                  <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: block; transform: translateX(1px);">
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                </button>
+
+                <!-- Sound On / Off -->
+                <button class="video-ctrl-btn ctrl-sound" id="showreel-ctrl-sound" aria-label="Unmute showreel" title="Sound On / Off">
+                  <svg class="icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                  <svg class="icon-unmuted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Timeline Scroller -->
+              <div class="ctrl-timeline-wrap" id="showreel-timeline-wrap" title="Drag to seek" role="slider" aria-label="Showreel Timeline" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                <div class="timeline-track">
+                  <div class="timeline-progress" id="showreel-timeline-progress"></div>
+                  <div class="timeline-thumb" id="showreel-timeline-thumb"></div>
+                </div>
+                <span class="timeline-time">
+                  <span class="time-current" id="showreel-time-current">0:00</span>
+                  <span class="time-total" id="showreel-time-total"> / 01:30</span>
+                </span>
+              </div>
+
+              <!-- Fullscreen Toggle Button -->
+              <button class="video-ctrl-btn ctrl-fullscreen" id="showreel-ctrl-fullscreen" aria-label="Fullscreen showreel" title="Fullscreen">
+                <svg class="icon-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" y1="3" x2="14" y2="10" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+                <svg class="icon-compress" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                  <polyline points="4 14 10 14 10 20" />
+                  <polyline points="20 10 14 10 14 4" />
+                  <line x1="14" y1="10" x2="21" y2="3" />
+                  <line x1="10" y1="14" x2="3" y2="21" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         2. ABOUT ME SECTION
+         ======================================================================= -->
+    <section id="about" class="section-padding" style="background-color: var(--bg-surface);">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">01 // Profile</div>
+          <h2 class="section-title">About Me</h2>
+        </div>
+
+        <div class="about-grid">
+          <!-- Main Introduction -->
+          <div class="about-text">
+            <p class="about-lead">
+              I’m Naresh Kumar, a Video Editor &amp; Motion Designer focused on creating engaging visual content for brands, creators, and digital platforms.
+            </p>
+            <p class="about-sub">
+              My work combines video editing, motion graphics, visual storytelling, color grading, sound design, and AI-assisted workflows to turn raw footage into polished, engaging content.
+            </p>
+          </div>
+
+          <!-- Profile Image (Black & White treatment, 4:5 cinematic frame) -->
+          <div class="about-visual">
+            <div class="portrait-frame">
+              <img src="public/images/profile.jpg" alt="Naresh Kumar Portrait" class="portrait-img" loading="lazy"
+                onerror="this.onerror=null; this.src='public/images/my%20profile%20photo%20.jpg';" />
+              <div class="portrait-hud">
+                <div class="hud-top">
+                  <span>FRAME // 01</span>
+                  <span>HYD-IN</span>
+                </div>
+                <div class="hud-bottom">
+                  <span>POST-PRODUCTION</span>
+                  <span>PROFILE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Information Boxes (2x2 Layout) -->
+          <div class="about-specs">
+            <div class="spec-tile">
+              <span class="spec-label"><span class="spec-dot"></span>Location</span>
+              <span class="spec-value">Hyderabad, India</span>
+            </div>
+            <div class="spec-tile">
+              <span class="spec-label"><span class="spec-dot"></span>Specialization</span>
+              <span class="spec-value">Short-Form &amp; Long-Form Editing</span>
+            </div>
+            <div class="spec-tile">
+              <span class="spec-label"><span class="spec-dot"></span>Core Skills</span>
+              <span class="spec-value">Motion Graphics · Color Grading · Sound Design</span>
+            </div>
+            <div class="spec-tile">
+              <span class="spec-label"><span class="spec-dot"></span>Education</span>
+              <span class="spec-value">Bachelor’s Degree in Visual Arts</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credibility Statistics (Refined, 20-25% Smaller, Restrained Gold Glow) -->
+        <div class="about-stats-banner" aria-label="Key Milestones & Statistics">
+          <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Videos Edited</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-number">2+</span>
+            <span class="stat-label">Years Experience</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-number">15+</span>
+            <span class="stat-label">Brands &amp; Projects</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         3. BRANDS I'VE WORKED WITH (LOGOS ONLY MARQUEE)
+         ======================================================================= -->
+    <section id="brands" class="brands-section">
+      <div class="container" style="text-align: center; margin-bottom: 36px;">
+        <div class="section-tag" style="justify-content: center;">02 // Trusted By</div>
+        <h2 class="section-title" style="font-size: 1.6rem; letter-spacing: 0.05em;">Brands I've Worked With</h2>
+      </div>
+
+      <div class="marquee-container" aria-label="Client Brand Logos">
+        <!-- Row 1: Leftward Scrolling -->
+        <div id="marquee-track-1" class="marquee-track marquee-track-left"></div>
+        <!-- Row 2: Rightward Scrolling -->
+        <div id="marquee-track-2" class="marquee-track marquee-track-right"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         4. MY WORK SECTION (TABS & VIDEO GRID)
+         ======================================================================= -->
+    <section id="work" class="section-padding">
+      <div class="container">
+        <div class="portfolio-header">
+          <div class="section-tag">03 // Selected Projects</div>
+          <h2 class="section-title">My Work</h2>
+
+          <!-- Exact Two Categories Tabs -->
+          <div class="tab-group" role="tablist" aria-label="Portfolio Categories">
+            <button id="tab-short" class="tab-btn active" role="tab" aria-selected="true"
+              aria-controls="portfolio-grid">
+              Short-Form
+            </button>
+            <button id="tab-long" class="tab-btn" role="tab" aria-selected="false" aria-controls="portfolio-grid">
+              Long-Form
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Portfolio Grid -->
+        <div id="portfolio-grid" class="portfolio-grid grid-short-form" role="tabpanel"></div>
+
+        <!-- View More Action Button -->
+        <div id="portfolio-action-wrap" class="portfolio-action-wrap">
+          <button id="btn-view-more" class="btn btn-secondary btn-view-more" aria-label="View more projects">
+            <span id="view-more-text">VIEW MORE</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="view-more-icon">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         5. RAW → FINAL COMPARISON SECTION (VERTICAL 9:16 SHORT-FORM)
+         ======================================================================= -->
+    <section id="raw-final" class="section-padding raw-final-section">
+      <div class="container">
+        <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 28px auto;">
+          <div class="section-tag" style="justify-content: center;">04 // The Edit Process</div>
+          <h2 class="section-title">RAW → FINAL</h2>
+          <p class="section-subtext" style="margin-top: 12px; color: var(--text-secondary); font-size: 1.05rem;">
+            Drag the horizontal slider handle up and down to reveal the transformation from flat sensor capture to the finished cinematic color grade and master.
+          </p>
+        </div>
+
+        <!-- External Labels Outside Video Box -->
+        <div class="rf-external-labels" aria-label="Comparison Labels">
+          <div class="rf-ext-badge rf-ext-final">
+            <span class="rf-badge-dot final"></span>
+            <span class="rf-ext-title">FINAL OUTPUT</span>
+            <span class="rf-ext-desc">Color Graded &amp; Mastered</span>
+          </div>
+          <div class="rf-ext-indicator">
+            <span class="rf-ext-arrow">↕</span>
+            <span class="rf-ext-hint">SLIDE TO COMPARE</span>
+          </div>
+          <div class="rf-ext-badge rf-ext-raw">
+            <span class="rf-badge-dot raw"></span>
+            <span class="rf-ext-title">RAW FOOTAGE</span>
+            <span class="rf-ext-desc">Flat Camera Sensor LOG</span>
+          </div>
+        </div>
+
+        <!-- Interactive Comparison Stage (Vertical 9:16 Short-Form) -->
+        <div class="rf-stage-wrapper">
+          <div class="rf-stage rf-stage-vertical" id="rf-stage" style="--split-pos-y: 50%;">
+            <!-- Video Window (Masked Frame with perfectly overlapped videos) -->
+            <div class="rf-video-window" id="rf-video-window">
+              <!-- RAW FOOTAGE Layer (Base Layer) -->
+              <div class="rf-layer rf-layer-raw" id="rf-layer-raw" aria-hidden="false">
+                <video id="rf-video-raw" class="rf-video rf-video-raw" muted playsinline preload="auto"
+                  disablePictureInPicture disableRemotePlayback>
+                  <source src="public/videos/raw video.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              <!-- FINAL OUTPUT Layer (Clipped Top Layer) -->
+              <div class="rf-layer rf-layer-final" id="rf-layer-final" aria-hidden="false">
+                <video id="rf-video-final" class="rf-video rf-video-final" muted playsinline preload="auto"
+                  disablePictureInPicture disableRemotePlayback>
+                  <source src="public/videos/final output.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+
+            <!-- Draggable Horizontal Split Line with Handle OUTSIDE the video window -->
+            <div class="rf-divider rf-divider-horizontal" id="rf-divider" role="slider" aria-label="Comparison split position"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+              <div class="rf-divider-line"></div>
+              <div class="rf-divider-stem"></div>
+              <!-- Small round handle OUTSIDE on the right with circle round stroke -->
+              <div class="rf-handle-round" id="rf-handle-round" aria-hidden="true" title="Drag up and down to compare">
+                <div class="rf-handle-stroke-ring"></div>
+                <div class="rf-handle-inner">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="7 15 12 20 17 15"></polyline>
+                    <polyline points="7 9 12 4 17 9"></polyline>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sleek Interactive Controls Bar (Play/Pause, Mute/Unmute, Progress Bar) -->
+            <div class="card-video-controls rf-controls" id="rf-controls" aria-label="Comparison Video Controls">
+              <div class="ctrl-btn-group">
+                <!-- Play / Pause -->
+                <button class="video-ctrl-btn ctrl-play" id="rf-ctrl-play" aria-label="Pause comparison" title="Play / Pause">
+                  <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                  <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; transform: translateX(1px);">
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                </button>
+
+                <!-- Sound On / Off -->
+                <button class="video-ctrl-btn ctrl-sound" id="rf-ctrl-sound" aria-label="Unmute comparison" title="Sound On / Off">
+                  <svg class="icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                  <svg class="icon-unmuted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Interactive Timeline Scroller / Progress Bar -->
+              <div class="ctrl-timeline-wrap rf-timeline-wrap" id="rf-timeline-wrap" title="Drag to seek" role="slider"
+                aria-label="Video Timeline" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                <div class="timeline-track">
+                  <div class="timeline-progress" id="rf-timeline-progress"></div>
+                  <div class="timeline-thumb" id="rf-timeline-thumb"></div>
+                </div>
+                <span class="timeline-time">
+                  <span id="rf-time-current">0:00</span>
+                  <span id="rf-time-total" style="color: var(--text-muted);"> / 0:30</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         6. FEEDBACK SECTION (TESTIMONIALS)
+         ======================================================================= -->
+    <section id="feedback" class="section-padding" style="background-color: var(--bg-surface);">
+      <div class="container">
+        <div class="section-header" style="text-align: center;">
+          <div class="section-tag" style="justify-content: center;">05 // Endorsements</div>
+          <h2 class="section-title">Feedback</h2>
+        </div>
+
+        <!-- 3 Placeholder Testimonial Cards -->
+        <div id="feedback-grid" class="feedback-grid"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         7. CONTACT / BOOK ME SECTION (LEAD GENERATION)
+         ======================================================================= -->
+    <section id="contact" class="section-padding contact-section">
+      <div class="container">
+        <div class="contact-box">
+          <div class="section-tag" style="justify-content: center;">06 // Get In Touch</div>
+          <h2 class="contact-heading">Let's Work Together</h2>
+          <p class="contact-subtext">Have a project in mind? Let's talk.</p>
+
+          <!-- Primary CTA Button (WhatsApp) -->
+          <div class="contact-cta-wrapper">
+            <a href="https://wa.me/919177421780?text=Hi%20Naresh%2C%20I%20came%20across%20your%20portfolio%20and%20would%20like%20to%20discuss%20a%20project!"
+              target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-book-me">
+              <span>Chat now</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                </path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       7. FOOTER
+       ========================================================================= -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>Naresh Kumar</h3>
+          <p>Video Editor &amp; Motion Designer</p>
+        </div>
+
+        <ul class="footer-links" aria-label="Footer Links">
+          <li><a href="https://www.linkedin.com/in/naresh-kumar-b14a202a1/" target="_blank" rel="noopener noreferrer"
+              class="social-link link-linkedin">LinkedIn</a></li>
+          <li><a href="https://www.instagram.com/naresh_0_1/" target="_blank" rel="noopener noreferrer"
+              class="social-link link-instagram">Instagram</a></li>
+          <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=nareshkumard009@gmail.com" target="_blank" rel="noopener noreferrer"
+              class="social-link link-email btn-book-me-action" title="Mail via Gmail">Email</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">&copy; 2026 Naresh Kumar. All rights reserved.</p>
+        <span class="footer-location">Hyderabad, India</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       VIDEO LIGHTBOX / MODAL
+       ========================================================================= -->
+  <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Project Title</h3>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Close video player">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div id="modal-media-slot" class="modal-video-container aspect-16-9">
+        <!-- Video element injected via main.js -->
+      </div>
+      <div class="modal-footer">
+        <p id="modal-description" class="modal-description"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fluid Gooey Cursor (matching akimafilms.com) -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="goo-filter" aria-hidden="true">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"></feGaussianBlur>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -15" result="goo"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"></feComposite>
+      </filter>
+    </defs>
+  </svg>
+  <div id="cursor" class="fluid-cursor" aria-hidden="true"></div>
+
+  <!-- Config Data & Scripts -->
+  <script src="js/portfolio-data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

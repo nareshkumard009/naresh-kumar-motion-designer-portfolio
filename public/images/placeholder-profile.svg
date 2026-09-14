@@ -1,0 +1,17 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" fill="none">
+  <defs>
+    <linearGradient id="bgProf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14151b"/>
+      <stop offset="50%" stop-color="#0d0e12"/>
+      <stop offset="100%" stop-color="#171822"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="750" fill="url(#bgProf)"/>
+  <path d="M30 30H70M30 30V70M570 30H530M570 30V70M30 720H70M30 720V680M570 720H530M570 720V680" stroke="#333842" stroke-width="2"/>
+  <circle cx="300" cy="300" r="110" stroke="#27272a" stroke-width="2"/>
+  <circle cx="300" cy="270" r="60" stroke="#3f3f46" stroke-width="2" fill="#181920"/>
+  <path d="M210 420C210 370 250 350 300 350C350 350 390 370 390 420" stroke="#3f3f46" stroke-width="2" fill="#181920"/>
+  <text x="300" y="490" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="600" letter-spacing="3" fill="#a1a1aa">NARESH KUMAR</text>
+  <text x="300" y="525" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" letter-spacing="2" fill="#71717a">PORTRAIT PLACEHOLDER</text>
+  <text x="300" y="555" text-anchor="middle" font-family="monospace" font-size="12" fill="#52525b">/public/images/profile.jpg</text>
+</svg>
