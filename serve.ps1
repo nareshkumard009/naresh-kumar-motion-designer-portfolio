@@ -24,7 +24,11 @@ public class PortfolioServer {
         { ".jpeg", "image/jpeg" },
         { ".webp", "image/webp" },
         { ".mp4", "video/mp4" },
-        { ".ico", "image/x-icon" }
+        { ".ico", "image/x-icon" },
+        { ".ttf", "font/ttf" },
+        { ".woff", "font/woff" },
+        { ".woff2", "font/woff2" },
+        { ".otf", "font/otf" }
     };
 
     public static void Run(int port, string root) {
@@ -83,6 +87,12 @@ public class PortfolioServer {
             var fi = new FileInfo(fullPath);
             long total = fi.Length;
             var rangeHeader = req.Headers["Range"];
+
+            if (req.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase)) {
+                res.ContentLength64 = total;
+                res.OutputStream.Close();
+                return;
+            }
 
             if (!string.IsNullOrEmpty(rangeHeader) && rangeHeader.StartsWith("bytes=")) {
                 var parts = rangeHeader.Substring(6).Split('-');

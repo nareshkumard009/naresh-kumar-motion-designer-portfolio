@@ -175,18 +175,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Mute RAW/FINAL comparison video if unmuted
-      const rfVideoFinal = document.getElementById("rf-video-final");
-      const rfVideoRaw = document.getElementById("rf-video-raw");
-      if (rfVideoFinal && !rfVideoFinal.muted) {
-        rfVideoFinal.muted = true;
+      if (typeof window.muteRawFinalComparison === "function") {
+        window.muteRawFinalComparison();
+      } else {
+        const rfVideoFinal = document.getElementById("rf-video-final");
+        const rfVideoRaw = document.getElementById("rf-video-raw");
+        if (rfVideoFinal) rfVideoFinal.muted = true;
         if (rfVideoRaw) rfVideoRaw.muted = true;
-        const rfSoundBtn = document.getElementById("rf-ctrl-sound");
-        if (rfSoundBtn) {
-          const rfm = rfSoundBtn.querySelector(".icon-muted");
-          const rfu = rfSoundBtn.querySelector(".icon-unmuted");
-          if (rfm) rfm.style.display = "block";
-          if (rfu) rfu.style.display = "none";
-        }
       }
 
       showreelVideo.muted = false;
@@ -499,6 +494,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===========================================================================
+  // 2.5 CREDIBILITY STATS (STATIC DISPLAY)
+  // ===========================================================================
+  const statsBanner = document.querySelector(".about-stats-banner");
+  if (statsBanner) {
+    const statItems = statsBanner.querySelectorAll(".stat-item");
+
+    // Sync from portfolioData.stats if provided
+    if (Array.isArray(data.stats) && data.stats.length > 0) {
+      statItems.forEach((item, index) => {
+        if (data.stats[index]) {
+          const numEl = item.querySelector(".stat-number");
+          const lblEl = item.querySelector(".stat-label");
+          if (numEl) {
+            const suffix = data.stats[index].suffix !== undefined ? data.stats[index].suffix : "+";
+            numEl.textContent = `${data.stats[index].value}${suffix}`;
+          }
+          if (lblEl && data.stats[index].label) {
+            lblEl.textContent = data.stats[index].label;
+          }
+        }
+      });
+    }
+  }
+
+  // ===========================================================================
   // 3. BRANDS MARQUEE RENDERING (LOGOS ONLY)
   // ===========================================================================
   const renderMarqueeRow = (rowId, brandList) => {
@@ -534,10 +554,47 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMarqueeRow("marquee-track-2", data.brandsRow2, "marquee-track-right");
   }
 
-  // State for view more toggle
+  // State for view more toggle and drag scroll
   let isShortFormExpanded = false;
+  let isCardDragScroll = false;
 
+  // Dynamic 40% black feathered vignette overlay for Short-Form carousel
+  const updateFeatherOverlays = () => {
+    const featherLeft = document.getElementById("portfolio-feather-left");
+    const featherRight = document.getElementById("portfolio-feather-right");
+    if (!featherLeft || !featherRight || !portfolioGrid) return;
 
+    if (currentCategory !== "shortForm") {
+      featherLeft.classList.remove("is-visible");
+      featherRight.classList.remove("is-visible");
+      return;
+    }
+
+    const scrollLeft = portfolioGrid.scrollLeft;
+    const scrollWidth = portfolioGrid.scrollWidth;
+    const clientWidth = portfolioGrid.clientWidth;
+    const maxScroll = scrollWidth - clientWidth;
+
+    if (maxScroll <= 8) {
+      featherLeft.classList.remove("is-visible");
+      featherRight.classList.remove("is-visible");
+      return;
+    }
+
+    // Left feather: no overlay when reached the start, visible as we scroll right
+    if (scrollLeft > 10) {
+      featherLeft.classList.add("is-visible");
+    } else {
+      featherLeft.classList.remove("is-visible");
+    }
+
+    // Right feather: visible while more content remains, disappears as we reach the rightmost end
+    if (scrollLeft < maxScroll - 10) {
+      featherRight.classList.add("is-visible");
+    } else {
+      featherRight.classList.remove("is-visible");
+    }
+  };
 
   // ===========================================================================
   // 4. PORTFOLIO TABS & GRID RENDERING
@@ -549,39 +606,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = data.portfolio[categoryKey] || [];
     const isShort = categoryKey === "shortForm";
 
-    // Set grid class: 4 columns for shortForm, 2 columns for longForm
+    // Set grid class: horizontal single row for shortForm, 2 columns for longForm
     portfolioGrid.className = `portfolio-grid ${isShort ? 'grid-short-form' : 'grid-long-form'}`;
 
     const viewMoreWrap = document.getElementById("portfolio-action-wrap");
-    const viewMoreBtn = document.getElementById("btn-view-more");
-    const viewMoreText = document.getElementById("view-more-text");
-
-    // For short-form, show "VIEW MORE" if more than 4 items
     if (viewMoreWrap) {
-      if (isShort && items.length > 4) {
-        viewMoreWrap.style.display = "flex";
-        if (viewMoreText) viewMoreText.textContent = isShortFormExpanded ? "VIEW LESS" : "VIEW MORE";
-        if (viewMoreBtn) {
-          if (isShortFormExpanded) {
-            viewMoreBtn.classList.add("expanded");
-          } else {
-            viewMoreBtn.classList.remove("expanded");
-          }
-        }
-      } else {
-        viewMoreWrap.style.display = "none";
-      }
+      viewMoreWrap.style.display = "none";
     }
+
+    const scrollNav = document.getElementById("portfolio-scroll-nav");
+    if (scrollNav) {
+      scrollNav.style.display = isShort ? "flex" : "none";
+    }
+
+    // Reset scroll position on category change
+    portfolioGrid.scrollLeft = 0;
+    requestAnimationFrame(updateFeatherOverlays);
+    setTimeout(updateFeatherOverlays, 80);
 
     portfolioGrid.innerHTML = items
       .map((item, idx) => {
-        const isHidden = isShort && idx >= 4 && !isShortFormExpanded;
-
         if (isShort) {
-          // Short-Form: 4-column row, no thumbnails, direct autoplaying muted loop video with minimal controls
+          // Short-Form: Single horizontal row of all 8 videos, direct autoplaying muted loop video with minimal controls
           return `
             <div 
-              class="portfolio-card card-short ${isHidden ? 'card-hidden' : (idx >= 4 ? 'card-revealed' : '')}" 
+              class="portfolio-card card-short" 
               data-id="${item.id}"
               data-index="${idx}"
               role="article"
@@ -604,12 +653,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   <source src="public/videos/my show reel.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
-
-                <!-- Top Meta Badges -->
-                <div class="card-meta-top">
-                  <span class="card-badge">${item.category}</span>
-                  <span class="card-duration">${item.duration || '9:16'}</span>
-                </div>
 
                 <!-- Minimal Video Controls Overlay (Play/Pause, Sound, Timeline Scroller, Fullscreen) -->
                 <div class="card-video-controls" aria-label="Video Controls">
@@ -692,12 +735,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   <source src="public/videos/my show reel.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
-
-                <!-- Top Meta Badges -->
-                <div class="card-meta-top">
-                  <span class="card-badge">${item.category}</span>
-                  <span class="card-duration">${item.duration || '16:9'}</span>
-                </div>
 
                 <!-- Minimal Video Controls Overlay (Play/Pause, Sound, Timeline Scroller, Fullscreen) -->
                 <div class="card-video-controls" aria-label="Video Controls">
@@ -841,18 +878,13 @@ document.addEventListener("DOMContentLoaded", () => {
               }
 
               // Mute RAW/FINAL comparison video if unmuted
-              const rfVideoFinal = document.getElementById("rf-video-final");
-              const rfVideoRaw = document.getElementById("rf-video-raw");
-              if (rfVideoFinal && !rfVideoFinal.muted) {
-                rfVideoFinal.muted = true;
+              if (typeof window.muteRawFinalComparison === "function") {
+                window.muteRawFinalComparison();
+              } else {
+                const rfVideoFinal = document.getElementById("rf-video-final");
+                const rfVideoRaw = document.getElementById("rf-video-raw");
+                if (rfVideoFinal) rfVideoFinal.muted = true;
                 if (rfVideoRaw) rfVideoRaw.muted = true;
-                const rfSoundBtn = document.getElementById("rf-ctrl-sound");
-                if (rfSoundBtn) {
-                  const rfm = rfSoundBtn.querySelector(".icon-muted");
-                  const rfu = rfSoundBtn.querySelector(".icon-unmuted");
-                  if (rfm) rfm.style.display = "block";
-                  if (rfu) rfu.style.display = "none";
-                }
               }
 
               // Mute all other card videos so only this video plays sound
@@ -995,7 +1027,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
-        // Fullscreen / Expand into Lightbox Modal (Our custom designed centered modal overlay)
+        // Fullscreen / Expand into Lightbox Modal with Fullscreen
         if (fullscreenBtn) {
           fullscreenBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -1003,18 +1035,19 @@ document.addEventListener("DOMContentLoaded", () => {
             if (project) {
               const currentTime = video ? video.currentTime : 0;
               if (video) video.pause();
-              openVideoModal(project, currentTime);
+              openVideoModal(project, currentTime, true);
             }
           });
         }
 
         // Clicking card info or media area (outside controls) opens centered lightbox modal
         card.addEventListener("click", (e) => {
+          if (isCardDragScroll) return;
           if (e.target.closest(".card-video-controls")) return;
           if (project) {
             const currentTime = video ? video.currentTime : 0;
             if (video) video.pause();
-            openVideoModal(project, currentTime);
+            openVideoModal(project, currentTime, false);
           }
         });
       }
@@ -1057,6 +1090,64 @@ document.addEventListener("DOMContentLoaded", () => {
       isShortFormExpanded = false;
       renderPortfolio("longForm");
     });
+  }
+
+  // Horizontal carousel scroll buttons for short-form
+  const btnScrollLeft = document.getElementById("btn-scroll-left");
+  const btnScrollRight = document.getElementById("btn-scroll-right");
+
+  if (btnScrollLeft && portfolioGrid) {
+    btnScrollLeft.addEventListener("click", () => {
+      const scrollStep = portfolioGrid.clientWidth * 0.75;
+      portfolioGrid.scrollBy({ left: -scrollStep, behavior: "smooth" });
+    });
+  }
+
+  if (btnScrollRight && portfolioGrid) {
+    btnScrollRight.addEventListener("click", () => {
+      const scrollStep = portfolioGrid.clientWidth * 0.75;
+      portfolioGrid.scrollBy({ left: scrollStep, behavior: "smooth" });
+    });
+  }
+
+  // Smooth mouse drag-to-scroll for desktop short-form single row
+  let isGridDragging = false;
+  let gridStartX = 0;
+  let gridInitialScrollLeft = 0;
+
+  if (portfolioGrid) {
+    portfolioGrid.addEventListener("mousedown", (e) => {
+      if (currentCategory !== "shortForm") return;
+      if (e.target.closest("button") || e.target.closest(".ctrl-timeline-wrap")) return;
+      isGridDragging = true;
+      isCardDragScroll = false;
+      gridStartX = e.pageX - portfolioGrid.offsetLeft;
+      gridInitialScrollLeft = portfolioGrid.scrollLeft;
+      portfolioGrid.classList.add("is-dragging");
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isGridDragging) {
+        isGridDragging = false;
+        if (portfolioGrid) portfolioGrid.classList.remove("is-dragging");
+        setTimeout(() => {
+          isCardDragScroll = false;
+        }, 50);
+      }
+    });
+
+    portfolioGrid.addEventListener("mousemove", (e) => {
+      if (!isGridDragging || currentCategory !== "shortForm") return;
+      const currentX = e.pageX - portfolioGrid.offsetLeft;
+      const walk = (currentX - gridStartX) * 1.5;
+      if (Math.abs(walk) > 6) {
+        isCardDragScroll = true;
+      }
+      portfolioGrid.scrollLeft = gridInitialScrollLeft - walk;
+    });
+
+    portfolioGrid.addEventListener("scroll", updateFeatherOverlays, { passive: true });
+    window.addEventListener("resize", updateFeatherOverlays, { passive: true });
   }
 
   // View More Button click event
@@ -1120,7 +1211,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (rfConfig.subtitle) {
           const subEl = rfSection.querySelector(".section-subtext");
-          if (subEl) subEl.textContent = rfConfig.subtitle;
+          if (subEl) {
+            if (rfConfig.subtitle.includes("<br>")) {
+              subEl.innerHTML = rfConfig.subtitle;
+            } else if (rfConfig.subtitle.includes(". ")) {
+              subEl.innerHTML = rfConfig.subtitle.replace(". ", ".<br>");
+            } else {
+              subEl.textContent = rfConfig.subtitle;
+            }
+          }
         }
         if (rfConfig.finalLabel) {
           const finalTitle = rfSection.querySelector(".rf-ext-final .rf-ext-title");
@@ -1156,12 +1255,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Strict Audio Policy:
-    // Final Output is MASTER (has audio track, unmutable by user).
-    // RAW is permanently silent (muted = true, volume = 0).
+    // Overall Audio State (controlled by comparison slider and mute/unmute button)
+    let isOverallMuted = true;
+    let masterVolume = 1.0;
+
+    // Both videos start muted for browser autoplay compliance
     rfVideoRaw.muted = true;
-    rfVideoRaw.volume = 0;
+    rfVideoRaw.volume = 1.0;
     rfVideoFinal.muted = true;
+    rfVideoFinal.volume = 0.5;
 
     let userExplicitlyPaused = false;
     let isScrubbingTimeline = false;
@@ -1302,46 +1404,85 @@ document.addEventListener("DOMContentLoaded", () => {
     syncVideosLoop();
 
     // =========================================================================
-    // Comparison Slider Divider (Horizontal Line with Outside Round Handle)
+    // Comparison Slider Divider (Vertical Line with Centered Round Handle)
     // Directly updates inline clipPath and CSS variable for zero-latency response
     // =========================================================================
     let isDraggingSplit = false;
-    let currentSplitY = 50;
+    let currentSplitX = 50;
     let splitRafId = null;
 
-    const setSplitY = (pct) => {
-      currentSplitY = Math.min(Math.max(pct, 2), 98);
+    // Dynamic Audio Volume Calculator (Unchanged behavior: RAW 100%, FINAL scales with reveal)
+    const applyAudioVolumes = () => {
+      // revealRatio: 0 = RAW fully revealed (FINAL 0%), 1 = FINAL fully revealed (RAW + FINAL)
+      const finalRatio = Math.min(Math.max((100 - currentSplitX) / 100, 0), 1);
+
+      if (isOverallMuted || masterVolume <= 0) {
+        rfVideoRaw.muted = true;
+        rfVideoFinal.muted = true;
+      } else {
+        // Audio of RAW video is always 100% (scaled by overall master volume)
+        rfVideoRaw.muted = false;
+        rfVideoRaw.volume = Math.min(Math.max(masterVolume * 1.0, 0), 1);
+
+        // Audio of FINAL video scales as slider reveals final (0% at raw, 100% at final)
+        const finalVol = Math.min(Math.max(masterVolume * finalRatio, 0), 1);
+        rfVideoFinal.volume = finalVol;
+        // Mute final track when volume is 0 to avoid any audio bleed
+        rfVideoFinal.muted = finalVol <= 0.001;
+      }
+
+      // Update sound icons on the volume button
+      if (rfSoundBtn) {
+        const iconMuted = rfSoundBtn.querySelector(".icon-muted");
+        const iconUnmuted = rfSoundBtn.querySelector(".icon-unmuted");
+        if (isOverallMuted || masterVolume <= 0) {
+          if (iconMuted) iconMuted.style.display = "block";
+          if (iconUnmuted) iconUnmuted.style.display = "none";
+          rfSoundBtn.setAttribute("aria-label", "Unmute comparison");
+        } else {
+          if (iconMuted) iconMuted.style.display = "none";
+          if (iconUnmuted) iconUnmuted.style.display = "block";
+          rfSoundBtn.setAttribute("aria-label", "Mute comparison");
+        }
+      }
+
+    };
+
+    const setSplitX = (pct) => {
+      currentSplitX = Math.min(Math.max(pct, 0), 100);
       if (splitRafId) cancelAnimationFrame(splitRafId);
       splitRafId = requestAnimationFrame(() => {
-        rfStage.style.setProperty("--split-pos-y", `${currentSplitY}%`);
+        rfStage.style.setProperty("--split-pos-x", `${currentSplitX}%`);
         if (rfLayerFinal) {
-          const clipVal = `inset(0 0 ${100 - currentSplitY}% 0)`;
+          // Left side reveals RAW (base layer), right side reveals FINAL (top layer)
+          const clipVal = `inset(0 0 0 ${currentSplitX}%)`;
           rfLayerFinal.style.clipPath = clipVal;
           rfLayerFinal.style.webkitClipPath = clipVal;
         }
         if (rfDivider) {
-          rfDivider.style.top = `${currentSplitY}%`;
-          rfDivider.setAttribute("aria-valuenow", Math.round(currentSplitY));
+          rfDivider.style.left = `${currentSplitX}%`;
+          rfDivider.setAttribute("aria-valuenow", Math.round(currentSplitX));
         }
+        applyAudioVolumes();
       });
     };
 
     // Initialize clip-path at 50%
-    setSplitY(50);
+    setSplitX(50);
 
-    const calcSplitFromClientY = (clientY) => {
+    const calcSplitFromClientX = (clientX) => {
       const rect = rfStage.getBoundingClientRect();
-      if (rect.height <= 0) return;
-      const offsetY = clientY - rect.top;
-      const pct = (offsetY / rect.height) * 100;
-      setSplitY(pct);
+      if (rect.width <= 0) return;
+      const offsetX = clientX - rect.left;
+      const pct = (offsetX / rect.width) * 100;
+      setSplitX(pct);
     };
 
     const onSplitPointerMove = (e) => {
       if (!isDraggingSplit) return;
       e.preventDefault();
-      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-      calcSplitFromClientY(clientY);
+      const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      calcSplitFromClientX(clientX);
     };
 
     const onSplitPointerUp = (e) => {
@@ -1368,23 +1509,23 @@ document.addEventListener("DOMContentLoaded", () => {
         rfStage.setPointerCapture(e.pointerId);
       } catch (err) {}
 
-      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-      calcSplitFromClientY(clientY);
+      const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      calcSplitFromClientX(clientX);
 
       window.addEventListener("pointermove", onSplitPointerMove, { passive: false });
       window.addEventListener("pointerup", onSplitPointerUp);
       window.addEventListener("pointercancel", onSplitPointerUp);
     });
 
-    // Keyboard support on horizontal divider (Up / Down arrows)
+    // Keyboard support on vertical divider (Left / Right arrows)
     if (rfDivider) {
       rfDivider.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
           e.preventDefault();
-          setSplitY(currentSplitY - 5);
-        } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+          setSplitX(currentSplitX - 5);
+        } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
           e.preventDefault();
-          setSplitY(currentSplitY + 5);
+          setSplitX(currentSplitX + 5);
         }
       });
     }
@@ -1420,30 +1561,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Sound Toggle (Master Audio only; RAW is always silent)
+    // Overall Volume Control (Volume button beside pause button controls master audio)
     if (rfSoundBtn) {
-      const iconMuted = rfSoundBtn.querySelector(".icon-muted");
-      const iconUnmuted = rfSoundBtn.querySelector(".icon-unmuted");
-
-      const updateSoundIcons = () => {
-        const isMuted = rfVideoFinal.muted;
-        if (isMuted) {
-          if (iconMuted) iconMuted.style.display = "block";
-          if (iconUnmuted) iconUnmuted.style.display = "none";
-          rfSoundBtn.setAttribute("aria-label", "Unmute comparison");
-        } else {
-          if (iconMuted) iconMuted.style.display = "none";
-          if (iconUnmuted) iconUnmuted.style.display = "block";
-          rfSoundBtn.setAttribute("aria-label", "Mute comparison");
-        }
-      };
-
       rfSoundBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        rfVideoRaw.muted = true;
-        rfVideoRaw.volume = 0;
 
-        if (rfVideoFinal.muted) {
+        if (isOverallMuted || masterVolume <= 0) {
           // Mute showreel if playing
           if (showreelVideo && !showreelVideo.muted) {
             showreelVideo.muted = true;
@@ -1469,16 +1592,22 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           }
 
-          rfVideoFinal.muted = false;
-          rfVideoFinal.volume = 1;
+          isOverallMuted = false;
+          if (masterVolume <= 0) masterVolume = 1.0;
         } else {
-          rfVideoFinal.muted = true;
+          isOverallMuted = true;
         }
 
-        updateSoundIcons();
+        applyAudioVolumes();
         playBoth();
       });
     }
+
+    // Global hook for cleanly muting comparison when other page elements play
+    window.muteRawFinalComparison = () => {
+      isOverallMuted = true;
+      applyAudioVolumes();
+    };
 
     // Interactive Timeline Scroller (Seek & Drag)
     if (rfTimelineWrap) {
@@ -1613,7 +1742,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return match && match[1] ? match[1] : null;
   };
 
-  function openVideoModal(project, startTime = 0) {
+  function openVideoModal(project, startTime = 0, startFullscreen = false) {
     if (!project || !videoModal || !modalContainer) return;
     if (modalCloseTimer) clearTimeout(modalCloseTimer);
     activeModalProject = project;
@@ -1632,8 +1761,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (rfVideoRaw && !rfVideoRaw.paused) rfVideoRaw.pause();
     if (rfVideoFinal && !rfVideoFinal.paused) rfVideoFinal.pause();
 
-    modalTitle.textContent = project.title || "Project Video";
-    modalDescription.textContent = project.description || `${project.category || 'Video'} • Edited by Naresh Kumar`;
+    if (modalTitle) modalTitle.textContent = project.title || "Project Video";
+    if (modalDescription) modalDescription.textContent = project.description || "";
 
     const isShort = project.aspectRatio === "9:16";
     modalContainer.className = `modal-video-container ${isShort ? 'aspect-9-16' : 'aspect-16-9'}`;
@@ -1671,18 +1800,16 @@ document.addEventListener("DOMContentLoaded", () => {
         ></iframe>
       `;
     } else {
-      // Native HTML5 MP4 Player
+      // Native HTML5 MP4 Player with Custom Glass Controls Overlay
       const posterAttr = project.thumbnail || project.fallbackThumbnail ? `poster="${project.thumbnail || project.fallbackThumbnail}"` : "";
       modalContainer.innerHTML = `
         <video 
           class="modal-video-player" 
-          controls 
           autoplay 
           playsinline 
           preload="auto"
           disablePictureInPicture
           disableRemotePlayback
-          controlsList="nodownload noplaybackrate noremoteplayback"
           ${posterAttr}
         >
           <source src="${project.videoUrl}" type="video/mp4" />
@@ -1690,9 +1817,85 @@ document.addEventListener("DOMContentLoaded", () => {
           <source src="public/videos/showreel.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+
+        <!-- Center Big Play Button Overlay -->
+        <button class="modal-big-play" id="modal-big-play" aria-label="Play video">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="6 4 20 12 6 20 6 4" />
+          </svg>
+        </button>
+
+        <!-- Custom Video Controls Overlay (Play/Pause, Sound + Volume Slider, Timeline Scroller, Fullscreen) -->
+        <div class="card-video-controls modal-video-controls" id="modal-video-controls" aria-label="Modal Video Controls">
+          <div class="ctrl-btn-group">
+            <!-- Play / Pause -->
+            <button class="video-ctrl-btn ctrl-play" id="modal-ctrl-play" aria-label="Pause video" title="Play / Pause (Space)">
+              <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+              <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; transform: translateX(1px);">
+                <polygon points="6 4 20 12 6 20 6 4" />
+              </svg>
+            </button>
+
+            <!-- Sound On / Off -->
+            <button class="video-ctrl-btn ctrl-sound" id="modal-ctrl-sound" aria-label="Mute video" title="Sound On / Off (M)">
+              <svg class="icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                <line x1="23" y1="9" x2="17" y2="15" />
+                <line x1="17" y1="9" x2="23" y2="15" />
+              </svg>
+              <svg class="icon-unmuted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Video Timeline Scroller Slider -->
+          <div class="ctrl-timeline-wrap" id="modal-timeline-wrap" title="Drag to seek (Left/Right arrow)" role="slider" aria-label="Video Timeline" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="timeline-track" id="modal-timeline-track">
+              <div class="timeline-progress" id="modal-timeline-progress"></div>
+              <div class="timeline-thumb" id="modal-timeline-thumb"></div>
+            </div>
+            <span class="timeline-time">
+              <span class="time-current" id="modal-time-current">0:00</span>
+              <span class="time-total" id="modal-time-total"> / ${project.duration || (isShort ? '0:30' : '01:30')}</span>
+            </span>
+          </div>
+
+          <!-- Fullscreen Toggle Button -->
+          <button class="video-ctrl-btn ctrl-fullscreen" id="modal-ctrl-fullscreen" aria-label="Fullscreen" title="Fullscreen (F)">
+            <svg class="icon-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 3 21 3 21 9" />
+              <polyline points="9 21 3 21 3 15" />
+              <line x1="21" y1="3" x2="14" y2="10" />
+              <line x1="3" y1="21" x2="10" y2="14" />
+            </svg>
+            <svg class="icon-compress" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+              <polyline points="4 14 10 14 10 20" />
+              <polyline points="20 10 14 10 14 4" />
+              <line x1="14" y1="10" x2="21" y2="3" />
+              <line x1="10" y1="14" x2="3" y2="21" />
+            </svg>
+          </button>
+        </div>
       `;
 
       const modalVid = modalContainer.querySelector("video");
+      const modalBigPlay = modalContainer.querySelector("#modal-big-play");
+      const modalPlayBtn = modalContainer.querySelector("#modal-ctrl-play");
+      const modalSoundBtn = modalContainer.querySelector("#modal-ctrl-sound");
+      const modalFullscreenBtn = modalContainer.querySelector("#modal-ctrl-fullscreen");
+      const modalTimelineWrap = modalContainer.querySelector("#modal-timeline-wrap");
+      const modalTimelineTrack = modalContainer.querySelector("#modal-timeline-track");
+      const modalTimelineProgress = modalContainer.querySelector("#modal-timeline-progress");
+      const modalTimelineThumb = modalContainer.querySelector("#modal-timeline-thumb");
+      const modalTimeCurrent = modalContainer.querySelector("#modal-time-current");
+      const modalTimeTotal = modalContainer.querySelector("#modal-time-total");
+
       if (modalVid) {
         if (typeof startTime === "number" && startTime > 0) {
           try {
@@ -1702,8 +1905,10 @@ document.addEventListener("DOMContentLoaded", () => {
           modalVid.currentTime = 0;
         }
 
-        // Try unmuted audio first since user intentionally opened the lightbox modal
+        // Try unmuted audio first since user intentionally clicked video
         modalVid.muted = false;
+        modalVid.volume = 1;
+
         const playPromise = modalVid.play();
         if (playPromise !== undefined) {
           playPromise.catch((err) => {
@@ -1711,6 +1916,264 @@ document.addEventListener("DOMContentLoaded", () => {
             modalVid.muted = true;
             modalVid.play().catch(e => console.error("Autoplay attempt failed:", e));
           });
+        }
+
+        // 1. Play / Pause Handling
+        const updatePlayUI = () => {
+          const isPaused = modalVid.paused;
+          if (modalContainer) {
+            modalContainer.classList.toggle("is-playing", !isPaused);
+          }
+          if (modalPlayBtn) {
+            const pPause = modalPlayBtn.querySelector(".icon-pause");
+            const pPlay = modalPlayBtn.querySelector(".icon-play");
+            if (pPause) pPause.style.display = isPaused ? "none" : "block";
+            if (pPlay) pPlay.style.display = isPaused ? "block" : "none";
+            modalPlayBtn.setAttribute("aria-label", isPaused ? "Play video" : "Pause video");
+          }
+        };
+
+        const toggleModalPlay = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (modalVid.paused) {
+            modalVid.play().catch(() => {});
+          } else {
+            modalVid.pause();
+          }
+        };
+
+        if (modalPlayBtn) modalPlayBtn.addEventListener("click", toggleModalPlay);
+        if (modalBigPlay) modalBigPlay.addEventListener("click", toggleModalPlay);
+        modalVid.addEventListener("click", (e) => {
+          toggleModalPlay(e);
+        });
+
+        modalVid.addEventListener("play", updatePlayUI);
+        modalVid.addEventListener("pause", updatePlayUI);
+        updatePlayUI();
+
+        // 2. Sound Mute / Unmute Handling
+        const updateSoundUI = () => {
+          const isMuted = modalVid.muted;
+          if (modalSoundBtn) {
+            const sm = modalSoundBtn.querySelector(".icon-muted");
+            const su = modalSoundBtn.querySelector(".icon-unmuted");
+            if (sm) sm.style.display = isMuted ? "block" : "none";
+            if (su) su.style.display = isMuted ? "none" : "block";
+            modalSoundBtn.setAttribute("aria-label", isMuted ? "Unmute video" : "Mute video");
+          }
+        };
+
+        if (modalSoundBtn) {
+          modalSoundBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            modalVid.muted = !modalVid.muted;
+            if (!modalVid.muted) modalVid.volume = 1;
+            updateSoundUI();
+          });
+        }
+
+        modalVid.addEventListener("volumechange", updateSoundUI);
+        updateSoundUI();
+
+
+        // 3. Timeline Scroller & Seeking
+        let isDragging = false;
+        const updateTimelineUI = (currentTime, duration) => {
+          if (isNaN(currentTime)) return;
+          const validDuration = duration && !isNaN(duration) && duration > 0 ? duration : 0;
+          const pct = validDuration > 0 ? Math.min(Math.max((currentTime / validDuration) * 100, 0), 100) : 0;
+
+          if (modalTimelineProgress) modalTimelineProgress.style.width = `${pct}%`;
+          if (modalTimelineThumb) modalTimelineThumb.style.left = `${pct}%`;
+          if (modalTimeCurrent) modalTimeCurrent.textContent = formatTime(currentTime);
+          if (modalTimeTotal && validDuration > 0) {
+            modalTimeTotal.textContent = ` / ${formatTime(validDuration)}`;
+          }
+          if (modalTimelineWrap) modalTimelineWrap.setAttribute("aria-valuenow", Math.round(pct));
+        };
+
+        modalVid.addEventListener("timeupdate", () => {
+          if (!isDragging) {
+            updateTimelineUI(modalVid.currentTime, modalVid.duration);
+          }
+        });
+
+        modalVid.addEventListener("loadedmetadata", () => {
+          if (modalTimeTotal && modalVid.duration > 0) {
+            modalTimeTotal.textContent = ` / ${formatTime(modalVid.duration)}`;
+          }
+          updateTimelineUI(modalVid.currentTime, modalVid.duration);
+        });
+
+        if (modalTimelineWrap && modalTimelineTrack) {
+          const seekFromPointer = (e) => {
+            const rect = modalTimelineTrack.getBoundingClientRect();
+            if (rect.width <= 0) return;
+            const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const offsetX = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+            const pct = offsetX / rect.width;
+            const duration = modalVid.duration || 0;
+            const targetTime = pct * duration;
+
+            if (modalTimelineProgress) modalTimelineProgress.style.width = `${pct * 100}%`;
+            if (modalTimelineThumb) modalTimelineThumb.style.left = `${pct * 100}%`;
+            if (modalTimeCurrent) modalTimeCurrent.textContent = formatTime(targetTime);
+
+            if (duration > 0 && !isNaN(targetTime) && isFinite(targetTime)) {
+              modalVid.currentTime = targetTime;
+            }
+          };
+
+          modalTimelineWrap.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isDragging = true;
+            modalTimelineWrap.classList.add("is-dragging");
+            try { modalTimelineWrap.setPointerCapture(e.pointerId); } catch (err) {}
+            const wasPaused = modalVid.paused;
+            seekFromPointer(e);
+
+            const onPointerMove = (moveEvt) => {
+              if (!isDragging) return;
+              moveEvt.preventDefault();
+              seekFromPointer(moveEvt);
+            };
+
+            const onPointerUp = (upEvt) => {
+              if (!isDragging) return;
+              isDragging = false;
+              modalTimelineWrap.classList.remove("is-dragging");
+              try { modalTimelineWrap.releasePointerCapture(upEvt.pointerId); } catch (err) {}
+              window.removeEventListener("pointermove", onPointerMove);
+              window.removeEventListener("pointerup", onPointerUp);
+              window.removeEventListener("pointercancel", onPointerUp);
+              if (!wasPaused && modalVid.paused) {
+                modalVid.play().catch(() => {});
+              }
+            };
+
+            window.addEventListener("pointermove", onPointerMove);
+            window.addEventListener("pointerup", onPointerUp);
+            window.addEventListener("pointercancel", onPointerUp);
+          });
+
+          modalTimelineWrap.addEventListener("click", (e) => e.stopPropagation());
+        }
+
+        // 4. True Fullscreen Controller
+        let modalInactivityTimer = null;
+        const isModalFs = () => Boolean(
+          document.fullscreenElement === modalContainer ||
+          document.webkitFullscreenElement === modalContainer ||
+          document.mozFullScreenElement === modalContainer ||
+          document.msFullscreenElement === modalContainer ||
+          modalContainer.classList.contains("is-fullscreen")
+        );
+
+        const resetModalInactivity = () => {
+          if (!isModalFs()) return;
+          modalContainer.classList.remove("controls-hidden");
+          if (modalInactivityTimer) clearTimeout(modalInactivityTimer);
+          if (modalVid && !modalVid.paused) {
+            modalInactivityTimer = setTimeout(() => {
+              if (isModalFs() && modalVid && !modalVid.paused) {
+                modalContainer.classList.add("controls-hidden");
+              }
+            }, 3000);
+          }
+        };
+
+        const updateModalFsUI = () => {
+          const inFs = isModalFs();
+          if (modalFullscreenBtn) {
+            const iconExpand = modalFullscreenBtn.querySelector(".icon-expand");
+            const iconCompress = modalFullscreenBtn.querySelector(".icon-compress");
+            if (iconExpand) iconExpand.style.display = inFs ? "none" : "block";
+            if (iconCompress) iconCompress.style.display = inFs ? "block" : "none";
+            modalFullscreenBtn.setAttribute("aria-label", inFs ? "Exit fullscreen" : "Fullscreen");
+            modalFullscreenBtn.setAttribute("title", inFs ? "Exit Fullscreen (F)" : "Fullscreen (F)");
+          }
+
+          if (!inFs) {
+            modalContainer.classList.remove("is-fullscreen", "controls-hidden");
+            if (modalInactivityTimer) clearTimeout(modalInactivityTimer);
+          } else {
+            modalContainer.classList.add("is-fullscreen");
+            resetModalInactivity();
+          }
+        };
+
+        const toggleModalFullscreen = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (!isModalFs()) {
+            const req = modalContainer.requestFullscreen ||
+                        modalContainer.webkitRequestFullscreen ||
+                        modalContainer.mozRequestFullScreen ||
+                        modalContainer.msRequestFullscreen;
+            if (req) {
+              req.call(modalContainer).catch(() => {
+                modalContainer.classList.add("is-fullscreen");
+                updateModalFsUI();
+              });
+            } else {
+              modalContainer.classList.add("is-fullscreen");
+              updateModalFsUI();
+            }
+          } else {
+            const exit = document.exitFullscreen ||
+                         document.webkitExitFullscreen ||
+                         document.mozCancelFullScreen ||
+                         document.msExitFullscreen;
+            if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+              exit.call(document).catch(() => {
+                modalContainer.classList.remove("is-fullscreen");
+                updateModalFsUI();
+              });
+            } else {
+              modalContainer.classList.remove("is-fullscreen");
+              updateModalFsUI();
+            }
+          }
+        };
+
+        if (modalFullscreenBtn) modalFullscreenBtn.addEventListener("click", toggleModalFullscreen);
+
+        modalContainer.addEventListener("mousemove", resetModalInactivity);
+        modalContainer.addEventListener("touchstart", resetModalInactivity, { passive: true });
+
+        // Double-click on video toggles fullscreen
+        modalVid.addEventListener("dblclick", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleModalFullscreen(e);
+        });
+
+        // Event listeners for Fullscreen change
+        const onFsChange = () => updateModalFsUI();
+        document.addEventListener("fullscreenchange", onFsChange);
+        document.addEventListener("webkitfullscreenchange", onFsChange);
+        document.addEventListener("mozfullscreenchange", onFsChange);
+        document.addEventListener("MSFullscreenChange", onFsChange);
+
+        // Save cleanup handler for modal close
+        window.__modalFsCleanup = () => {
+          document.removeEventListener("fullscreenchange", onFsChange);
+          document.removeEventListener("webkitfullscreenchange", onFsChange);
+          document.removeEventListener("mozfullscreenchange", onFsChange);
+          document.removeEventListener("MSFullscreenChange", onFsChange);
+          if (modalInactivityTimer) clearTimeout(modalInactivityTimer);
+        };
+
+        // If requested to start directly in fullscreen, trigger immediately!
+        if (startFullscreen) {
+          toggleModalFullscreen();
         }
 
         // Gracefully handle missing local video in modal
@@ -1739,6 +2202,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function closeVideoModal() {
     if (!videoModal || !videoModal.classList.contains("active")) return;
+
+    // Exit true fullscreen if active
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+      if (exit) {
+        try { exit.call(document); } catch (e) {}
+      }
+    }
+    if (typeof window.__modalFsCleanup === "function") {
+      window.__modalFsCleanup();
+      window.__modalFsCleanup = null;
+    }
+    if (modalContainer) {
+      modalContainer.classList.remove("is-fullscreen", "controls-hidden", "is-playing");
+    }
 
     // 1. Immediately pause and mute any video or audio in modal
     const modalVid = modalContainer.querySelector("video");
@@ -1795,13 +2273,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const rfVidRaw = document.getElementById("rf-video-raw");
     const rfVidFinal = document.getElementById("rf-video-final");
     if (rfVidRaw && rfVidRaw.paused) {
-      rfVidRaw.muted = true;
-      rfVidRaw.volume = 0;
       rfVidRaw.play().catch(() => {});
     }
     if (rfVidFinal && rfVidFinal.paused) {
-      rfVidFinal.muted = true;
       rfVidFinal.play().catch(() => {});
+    }
+    if (typeof window.muteRawFinalComparison === "function") {
+      window.muteRawFinalComparison();
+    } else {
+      if (rfVidRaw) rfVidRaw.muted = true;
+      if (rfVidFinal) rfVidFinal.muted = true;
     }
 
     // 4. Clear container after transition completes so fade-out is seamless
@@ -1823,8 +2304,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && videoModal && videoModal.classList.contains("active")) {
+    if (!videoModal || !videoModal.classList.contains("active")) return;
+
+    if (e.key === "Escape") {
       closeVideoModal();
+      return;
+    }
+
+    // Interactive shortcuts when modal is playing
+    const modalVid = modalContainer ? modalContainer.querySelector("video") : null;
+    if (!modalVid) return;
+
+    if (e.key === " " || e.code === "Space") {
+      e.preventDefault();
+      if (modalVid.paused) modalVid.play().catch(() => {});
+      else modalVid.pause();
+    } else if (e.key === "m" || e.key === "M") {
+      e.preventDefault();
+      const modalSoundBtn = modalContainer.querySelector("#modal-ctrl-sound");
+      if (modalSoundBtn) modalSoundBtn.click();
+    } else if (e.key === "f" || e.key === "F") {
+      e.preventDefault();
+      const modalFsBtn = modalContainer.querySelector("#modal-ctrl-fullscreen");
+      if (modalFsBtn) modalFsBtn.click();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      modalVid.currentTime = Math.max(0, modalVid.currentTime - 5);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      modalVid.currentTime = Math.min(modalVid.duration || 0, modalVid.currentTime + 5);
     }
   });
 
@@ -1833,41 +2341,16 @@ document.addEventListener("DOMContentLoaded", () => {
   window.closeVideoModal = closeVideoModal;
 
   // ===========================================================================
-  // 6. TESTIMONIALS RENDERING
-  // ===========================================================================
-  const feedbackGrid = document.getElementById("feedback-grid");
-  if (feedbackGrid && data.testimonials) {
-    feedbackGrid.innerHTML = data.testimonials
-      .map(
-        (t) => `
-        <div class="feedback-card">
-          <div class="feedback-quote-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.57-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/>
-            </svg>
-          </div>
-          <p class="feedback-quote">"${t.quote}"</p>
-          <div class="feedback-author">
-            <div class="author-avatar" aria-hidden="true">${t.clientName.charAt(0)}</div>
-            <div class="author-info">
-              <span class="author-name">${t.clientName}</span>
-              <span class="author-role">${t.role} • ${t.company}</span>
-            </div>
-          </div>
-        </div>
-      `
-      )
-      .join("");
-  }
-
-  // ===========================================================================
-  // 7. BOOK ME & DIRECT CONTACT (GMAIL COMPOSE & SOCIAL LINKS)
+  // 6. DIRECT CONTACT (BLANK GMAIL COMPOSE, PHONE & SOCIAL LINKS)
   // ===========================================================================
   const setupBookingLinks = () => {
     const email = (data.personal && data.personal.email) || "nareshkumard009@gmail.com";
+    const phone = (data.personal && data.personal.phone) || "+91 9177421780";
+
+    // Blank Gmail compose URL with NO pre-filled subject or message
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
 
-    // Ensure all Email links take users directly to Gmail compose
+    // Ensure all Email links open a blank compose draft in Gmail
     const emailLinks = document.querySelectorAll(".btn-book-me-action, .link-email");
     emailLinks.forEach((btn) => {
       btn.setAttribute("href", gmailUrl);
@@ -1879,19 +2362,17 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Social links (LinkedIn & Instagram)
-    const linkedinLinks = document.querySelectorAll(".link-linkedin");
-    const instagramLinks = document.querySelectorAll(".link-instagram");
+    // Ensure Phone links direct to tel:
+    const phoneLinks = document.querySelectorAll(".link-phone");
+    phoneLinks.forEach((p) => {
+      p.setAttribute("href", `tel:${phone.replace(/[^0-9+]/g, "")}`);
+    });
 
+    // Social links (LinkedIn)
+    const linkedinLinks = document.querySelectorAll(".link-linkedin");
     linkedinLinks.forEach((l) => {
       if (data.personal && data.personal.socials && data.personal.socials.linkedin) {
         l.setAttribute("href", data.personal.socials.linkedin);
-      }
-    });
-
-    instagramLinks.forEach((l) => {
-      if (data.personal && data.personal.socials && data.personal.socials.instagram) {
-        l.setAttribute("href", data.personal.socials.instagram);
       }
     });
   };
@@ -1899,12 +2380,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBookingLinks();
 
   // ===========================================================================
-  // 8. FLUID GOOEY CURSOR (EXACT MATCH TO AKIMAFILMS.COM)
+  // 8. FLUID GOOEY CURSOR & TOUCH FLOW (MATCHING AKIMAFILMS.COM)
   // ===========================================================================
   const initCustomCursor = () => {
-    // Only activate on devices with fine pointer (desktop mouse/trackpad)
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-
     const cursor = document.getElementById("cursor");
     if (!cursor) return;
 
@@ -1913,6 +2391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let mouseY = -100;
     let hasMoved = false;
     let isVisible = false;
+    let touchFadeTimer = null;
 
     // Initialize array of trailing position objects
     const cursorHistory = [];
@@ -1929,10 +2408,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const cursorCircles = Array.from(cursor.querySelectorAll(".cursor-circle"));
 
-    // Track mouse position
-    window.addEventListener("pointermove", (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+    const setPosition = (x, y) => {
+      mouseX = x;
+      mouseY = y;
 
       if (!hasMoved) {
         hasMoved = true;
@@ -1946,7 +2424,50 @@ document.addEventListener("DOMContentLoaded", () => {
         isVisible = true;
         cursor.classList.add("cursor-visible");
       }
+    };
+
+    // 1. Mouse Tracking (Desktop)
+    window.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return; // Handled by touch events
+      setPosition(e.clientX, e.clientY);
     }, { passive: true });
+
+    // 2. Touch Flow Tracking (Mobile / Tablet Touch)
+    window.addEventListener("touchstart", (e) => {
+      if (touchFadeTimer) clearTimeout(touchFadeTimer);
+      if (e.touches && e.touches[0]) {
+        const t = e.touches[0];
+        mouseX = t.clientX;
+        mouseY = t.clientY;
+        // Snap trailing points to the touch point so flow emerges naturally
+        for (let i = 0; i < TAIL_LENGTH; i++) {
+          cursorHistory[i].x = mouseX;
+          cursorHistory[i].y = mouseY;
+        }
+        hasMoved = true;
+        isVisible = true;
+        cursor.classList.add("cursor-visible");
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+      if (touchFadeTimer) clearTimeout(touchFadeTimer);
+      if (e.touches && e.touches[0]) {
+        const t = e.touches[0];
+        setPosition(t.clientX, t.clientY);
+      }
+    }, { passive: true });
+
+    const onTouchEnd = () => {
+      if (touchFadeTimer) clearTimeout(touchFadeTimer);
+      touchFadeTimer = setTimeout(() => {
+        isVisible = false;
+        cursor.classList.remove("cursor-visible");
+      }, 400);
+    };
+
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
     // Viewport enter / leave listeners
     document.addEventListener("mouseleave", () => {

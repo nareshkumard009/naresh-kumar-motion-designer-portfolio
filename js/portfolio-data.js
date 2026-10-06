@@ -3,8 +3,8 @@
  * NARESH KUMAR — PORTFOLIO CONFIGURATION DATA
  * =============================================================================
  * 
- * Edit this single file to update your projects, contact info, brand logos, 
- * testimonials, and showreel without touching any HTML or CSS!
+ * Edit this single file to update your projects, contact info, statistics, 
+ * brand logos, testimonials, and showreel without touching any HTML or CSS!
  * 
  * ASSET DIRECTORY GUIDE:
  * - Showreel video:       public/videos/showreel.mp4
@@ -36,10 +36,18 @@ const portfolioData = {
     fallbackProfileImage: "public/images/placeholder-profile.svg",
     socials: {
       behance: "https://www.behance.net/nareshkumar01",
-      linkedin: "https://www.linkedin.com/in/naresh-kumar-b14a202a1/",
-      instagram: "https://www.instagram.com/naresh_0_1/"
+      linkedin: "https://www.linkedin.com/in/naresh-kumar-b14a202a1/"
     }
   },
+
+  // ---------------------------------------------------------------------------
+  // Credibility Statistics (About Section Milestones)
+  // ---------------------------------------------------------------------------
+  stats: [
+    { value: 2, suffix: "+", label: "Years Experience" },
+    { value: 25, suffix: "+", label: "Brands & Projects" },
+    { value: 300, suffix: "+", label: "Videos Edited" }
+  ],
 
   // ---------------------------------------------------------------------------
   // Hero Showreel
@@ -47,11 +55,11 @@ const portfolioData = {
   showreel: {
     title: "Naresh Kumar — Showreel",
     // Local video path (e.g. "public/videos/showreel.mp4")
-    videoUrl: "public/videos/showreel.mp4",
+    videoUrl: "public/videos/my show reel.mp4",
     // Or set to "youtube" / "vimeo" with an embed URL if preferred:
     videoType: "mp4", // "mp4" | "youtube" | "vimeo"
     embedUrl: "",     // e.g. "https://www.youtube-nocookie.com/embed/YOUR_ID"
-    poster: "public/thumbnails/showreel-poster.jpg",
+    poster: "public/thumbnails/placeholder-long.svg",
     duration: "01:30"
   },
 
@@ -250,7 +258,7 @@ const portfolioData = {
   // ---------------------------------------------------------------------------
   // SECTION 04 // RAW → FINAL INTERACTIVE COMPARISON SLIDER
   // ---------------------------------------------------------------------------
-  // Drag the horizontal slider up & down to reveal the transformation from
+  // Drag the vertical slider left & right to reveal the transformation from
   // raw camera/LOG capture to the finished cinematic color grade and master.
   // 1. Place your RAW camera video in "public/videos/raw video.mp4"
   // 2. Place your Final color-graded video in "public/videos/final output.mp4"
@@ -258,59 +266,22 @@ const portfolioData = {
   rawFinal: {
     tag: "04 // The Edit Process",
     title: "RAW → FINAL",
-    subtitle: "Drag the horizontal slider handle up and down to reveal the transformation from flat sensor capture to the finished cinematic color grade and master.",
+    subtitle: "I shape raw footage into compelling visual stories.<br>Through precise editing, motion and color, every frame finds its purpose.",
     rawVideo: "public/videos/raw video.mp4",
     finalVideo: "public/videos/final output.mp4",
     rawLabel: "RAW FOOTAGE",
-    rawDesc: "Flat Camera Sensor LOG",
+    rawDesc: "",
     finalLabel: "FINAL OUTPUT",
-    finalDesc: "Color Graded & Mastered",
+    finalDesc: "",
     aspectRatio: "9:16"
   },
 
   // ---------------------------------------------------------------------------
-  // Testimonials (3 Placeholder items as requested)
-  // ---------------------------------------------------------------------------
-  testimonials: [
-    {
-      id: "test-01",
-      quote: "Client feedback will appear here.",
-      clientName: "Client Name",
-      role: "Founder & Creative Director",
-      company: "Digital Agency"
-    },
-    {
-      id: "test-02",
-      quote: "Client feedback will appear here.",
-      clientName: "Client Name",
-      role: "Lead Content Creator",
-      company: "Media Studio"
-    },
-    {
-      id: "test-03",
-      quote: "Client feedback will appear here.",
-      clientName: "Client Name",
-      role: "Brand Marketing Lead",
-      company: "Consumer Brand"
-    }
-  ],
-
-  // ---------------------------------------------------------------------------
-  // Contact & Booking Settings
+  // Contact & Booking Settings (Opens blank email with no pre-written subject or body)
   // ---------------------------------------------------------------------------
   booking: {
-    subject: "Video Editing Project Inquiry",
-    body: `Hi Naresh,
-
-I'd like to discuss a video editing project.
-
-Project details:
-
-Timeline:
-
-Budget:
-
-Thanks.`
+    subject: "",
+    body: ""
   }
 };
 
