@@ -192,6 +192,31 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
+  // Helper to strictly update a card video's muted state and keep its volume button in sync
+  const setCardMuted = (card, muted) => {
+    if (!card) return;
+    const video = card.querySelector(".card-video");
+    const soundBtn = card.querySelector(".ctrl-sound");
+    if (video) {
+      video.muted = muted;
+    }
+    if (soundBtn) {
+      const iconMuted = soundBtn.querySelector(".icon-muted");
+      const iconUnmuted = soundBtn.querySelector(".icon-unmuted");
+      if (muted) {
+        if (iconMuted) iconMuted.style.display = "block";
+        if (iconUnmuted) iconUnmuted.style.display = "none";
+        soundBtn.setAttribute("aria-label", "Unmute video");
+        soundBtn.setAttribute("title", "Sound Off (Click to unmute)");
+      } else {
+        if (iconMuted) iconMuted.style.display = "none";
+        if (iconUnmuted) iconUnmuted.style.display = "block";
+        soundBtn.setAttribute("aria-label", "Mute video");
+        soundBtn.setAttribute("title", "Sound On (Click to mute)");
+      }
+    }
+  };
+
   // ===========================================================================
   // 2. HERO SHOWREEL VIDEO & CONTROLS (AUTOPLAY MUTED LOOP WITH MINIMAL CONTROLS)
   // ===========================================================================
@@ -246,18 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const unmuteShowreel = () => {
       // Mute all portfolio card videos so only showreel plays sound
-      if (portfolioGrid) {
-        portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
-          v.muted = true;
-          const otherSoundBtn = v.closest(".portfolio-card")?.querySelector(".ctrl-sound");
-          if (otherSoundBtn) {
-            const om = otherSoundBtn.querySelector(".icon-muted");
-            const ou = otherSoundBtn.querySelector(".icon-unmuted");
-            if (om) om.style.display = "block";
-            if (ou) ou.style.display = "none";
-          }
-        });
-      }
+      document.querySelectorAll(".portfolio-card").forEach((c) => {
+        setCardMuted(c, true);
+      });
 
       // Mute RAW/FINAL comparison video if unmuted
       if (typeof window.muteRawFinalComparison === "function") {
@@ -565,12 +581,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Viewport observer to pause showreel video when scrolled away
+    // Viewport observer to pause and mute showreel video when scrolled away
     try {
       const showreelObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting && showreelVideo && !showreelVideo.paused) {
-            showreelVideo.pause();
+          if (!entry.isIntersecting && showreelVideo) {
+            if (!showreelVideo.paused) {
+              showreelVideo.pause();
+            }
+            if (!showreelVideo.muted) {
+              showreelVideo.muted = true;
+              updateShowreelSoundIcons();
+            }
           }
         });
       }, { threshold: 0.1 });
@@ -919,19 +941,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Sound On / Off Toggle
         if (soundBtn) {
-          const iconMuted = soundBtn.querySelector(".icon-muted");
-          const iconUnmuted = soundBtn.querySelector(".icon-unmuted");
-
           const updateSoundIcons = () => {
-            if (video.muted) {
-              if (iconMuted) iconMuted.style.display = "block";
-              if (iconUnmuted) iconUnmuted.style.display = "none";
-              soundBtn.setAttribute("aria-label", "Unmute video");
-            } else {
-              if (iconMuted) iconMuted.style.display = "none";
-              if (iconUnmuted) iconUnmuted.style.display = "block";
-              soundBtn.setAttribute("aria-label", "Mute video");
-            }
+            setCardMuted(card, video.muted);
           };
 
           soundBtn.addEventListener("click", (e) => {
@@ -960,26 +971,22 @@ document.addEventListener("DOMContentLoaded", () => {
               }
 
               // Mute all other card videos so only this video plays sound
-              portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
-                if (v !== video) {
-                  v.muted = true;
-                  const otherSoundBtn = v.closest(".portfolio-card")?.querySelector(".ctrl-sound");
-                  if (otherSoundBtn) {
-                    const om = otherSoundBtn.querySelector(".icon-muted");
-                    const ou = otherSoundBtn.querySelector(".icon-unmuted");
-                    if (om) om.style.display = "block";
-                    if (ou) ou.style.display = "none";
-                  }
+              document.querySelectorAll(".portfolio-card").forEach((c) => {
+                if (c !== card) {
+                  setCardMuted(c, true);
                 }
               });
 
-              video.muted = false;
+              setCardMuted(card, false);
               video.volume = 1;
             } else {
-              video.muted = true;
+              setCardMuted(card, true);
             }
-            updateSoundIcons();
           });
+
+          // Always listen to volumechange so UI stays 100% in sync whenever video.muted changes
+          video.addEventListener("volumechange", updateSoundIcons);
+          updateSoundIcons();
         }
 
         // Video Timeline Scroller (Seek & Drag Scrubbing)
@@ -1198,8 +1205,12 @@ document.addEventListener("DOMContentLoaded", () => {
       incomingPanel.classList.remove("is-hidden-left", "is-hidden-right");
       incomingPanel.classList.add("is-active");
 
-      // Pause outgoing videos
-      outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
+      // Pause outgoing videos and mute them
+      outgoingPanel.querySelectorAll(".portfolio-card").forEach((c) => {
+        const v = c.querySelector(".card-video");
+        if (v && !v.paused) v.pause();
+        setCardMuted(c, true);
+      });
 
       // Play only videos in the incoming panel that are currently visible in the viewport
       schedulePortfolioCardPlayback();
@@ -1212,8 +1223,12 @@ document.addEventListener("DOMContentLoaded", () => {
       incomingPanel.classList.remove("is-hidden-left", "is-hidden-right");
       incomingPanel.classList.add("is-active");
 
-      // Pause outgoing videos
-      outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
+      // Pause outgoing videos and mute them
+      outgoingPanel.querySelectorAll(".portfolio-card").forEach((c) => {
+        const v = c.querySelector(".card-video");
+        if (v && !v.paused) v.pause();
+        setCardMuted(c, true);
+      });
 
       // Play only videos in the incoming panel that are currently visible in the viewport
       schedulePortfolioCardPlayback();
@@ -1313,10 +1328,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const activePanel = document.querySelector(".portfolio-panel.is-active");
     const inactivePanels = document.querySelectorAll(".portfolio-panel:not(.is-active)");
 
-    // Ensure all videos in inactive panels are strictly paused
+    // Ensure all videos in inactive panels are strictly paused and muted
     inactivePanels.forEach((panel) => {
-      panel.querySelectorAll(".card-video").forEach((v) => {
-        if (!v.paused) v.pause();
+      panel.querySelectorAll(".portfolio-card").forEach((c) => {
+        const v = c.querySelector(".card-video");
+        if (v && !v.paused) v.pause();
+        setCardMuted(c, true);
       });
     });
 
@@ -1326,10 +1343,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const vw = window.innerWidth || document.documentElement.clientWidth;
     const panelRect = activePanel.getBoundingClientRect();
 
-    // If the active panel is completely outside the viewport vertically, pause all its videos
+    // If the active panel is completely outside the viewport vertically, pause and mute all its videos
     if (panelRect.bottom < 40 || panelRect.top > vh - 40) {
-      activePanel.querySelectorAll(".card-video").forEach((v) => {
-        if (!v.paused) v.pause();
+      activePanel.querySelectorAll(".portfolio-card").forEach((c) => {
+        const v = c.querySelector(".card-video");
+        if (v && !v.paused) v.pause();
+        setCardMuted(c, true);
       });
       return;
     }
@@ -1358,13 +1377,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (inVerticalView && inHorizontalView) {
         if (video.paused) {
-          video.muted = true;
+          // When entering view or coming back, video is muted and volume button strictly shows OFF
+          setCardMuted(card, true);
           const playPromise = video.play();
           if (playPromise !== undefined) playPromise.catch(() => {});
         }
       } else {
         if (!video.paused) {
           video.pause();
+        }
+        // When scrolled away, ensure video is muted and volume button shows OFF immediately
+        if (!video.muted) {
+          setCardMuted(card, true);
         }
       }
     });
@@ -1791,18 +1815,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
           // Mute all portfolio videos
-          if (portfolioGrid) {
-            portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
-              v.muted = true;
-              const cardSoundBtn = v.closest(".portfolio-card")?.querySelector(".ctrl-sound");
-              if (cardSoundBtn) {
-                const cm = cardSoundBtn.querySelector(".icon-muted");
-                const cu = cardSoundBtn.querySelector(".icon-unmuted");
-                if (cm) cm.style.display = "block";
-                if (cu) cu.style.display = "none";
-              }
-            });
-          }
+          document.querySelectorAll(".portfolio-card").forEach((c) => {
+            setCardMuted(c, true);
+          });
 
           isOverallMuted = false;
           if (masterVolume <= 0) masterVolume = 1.0;
@@ -1935,6 +1950,10 @@ document.addEventListener("DOMContentLoaded", () => {
             pauseBoth();
             stopSyncLoop();
             updatePlayIcons(false);
+            if (!isOverallMuted) {
+              isOverallMuted = true;
+              applyAudioVolumes();
+            }
           }
         });
       }, { threshold: 0.15 });
@@ -2002,11 +2021,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (showreelVideo && !showreelVideo.paused) {
       showreelVideo.pause();
     }
-    if (portfolioGrid) {
-      portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
-        if (!v.paused) v.pause();
-      });
-    }
+    document.querySelectorAll(".portfolio-card").forEach((c) => {
+      const v = c.querySelector(".card-video");
+      if (v && !v.paused) v.pause();
+      setCardMuted(c, true);
+    });
     const rfVideoRaw = document.getElementById("rf-video-raw");
     const rfVideoFinal = document.getElementById("rf-video-final");
     if (rfVideoRaw && !rfVideoRaw.paused) rfVideoRaw.pause();
