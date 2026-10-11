@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <linearGradient id="bgLong" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1017"/>
+      <stop offset="50%" stop-color="#0a0b0e"/>
+      <stop offset="100%" stop-color="#141622"/>
+    </linearGradient>
+    <radialGradient id="glowLong" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e5a93c" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#e5a93c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgLong)"/>
+  <rect width="1920" height="1080" fill="url(#glowLong)"/>
+
+  <!-- Grid overlay -->
+  <line x1="0" y1="540" x2="1920" y2="540" stroke="#1f222e" stroke-width="1" stroke-dasharray="8 8"/>
+  <line x1="960" y1="0" x2="960" y2="1080" stroke="#1f222e" stroke-width="1" stroke-dasharray="8 8"/>
+
+  <!-- Outer HUD Corner Brackets -->
+  <path d="M 80 140 L 80 80 L 140 80" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 1840 140 L 1840 80 L 1780 80" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 80 940 L 80 1000 L 140 1000" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 1840 940 L 1840 1000 L 1780 1000" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Technical Marks -->
+  <text x="80" y="55" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, monospace" font-size="14" letter-spacing="4" fill="#717585">REC // 4K DCI · 24.00 FPS</text>
+  <text x="1840" y="55" text-anchor="end" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, monospace" font-size="14" letter-spacing="4" fill="#e5a93c">PRORES 422 HQ</text>
+
+  <!-- Center Play / Slate Graphic -->
+  <circle cx="960" cy="500" r="76" stroke="#2a2d3d" stroke-width="2" fill="#12141c"/>
+  <polygon points="950,470 985,500 950,530" fill="#e5a93c"/>
+
+  <!-- Center Title -->
+  <text x="960" y="630" text-anchor="middle" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif" font-size="28" font-weight="700" letter-spacing="6" fill="#f4f5f8">CINEMATIC LONG-FORM</text>
+  <text x="960" y="670" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" letter-spacing="4" fill="#8a8e9e">POST-PRODUCTION · COLOR GRADE · SOUND DESIGN</text>
+  <text x="960" y="710" text-anchor="middle" font-family="monospace" font-size="13" letter-spacing="2" fill="#525666">ASPECT RATIO 16:9 // 3840×2160</text>
+</svg>

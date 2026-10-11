@@ -35,11 +35,15 @@ This guide makes it straightforward to replace the placeholder assets with your 
   - `long-02.mp4`
   - `long-03.mp4`
   - `long-04.mp4`
+  - `long-05.mp4`
+  - `long-06.mp4`
 - **Thumbnails**: Place in `public/thumbnails/` as:
   - `long-01.jpg`
   - `long-02.jpg`
   - `long-03.jpg`
   - `long-04.jpg`
+  - `long-05.jpg`
+  - `long-06.jpg`
 
 ---
 
@@ -56,4 +60,4 @@ This guide makes it straightforward to replace the placeholder assets with your 
 ---
 
 ### 6. Updating Information & Details
-All titles, descriptions, social links (Behance, LinkedIn, Instagram), email, phone, and testimonials can be modified in **`js/portfolio-data.js`**. You don't have to touch any HTML code!
+All titles, descriptions, social links (Behance, LinkedIn), email, phone, WhatsApp, and testimonials can be modified in **`js/portfolio-data.js`**. You don't have to touch any HTML code!

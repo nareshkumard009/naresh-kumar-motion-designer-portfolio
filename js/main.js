@@ -23,13 +23,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.querySelectorAll(".nav-link");
   const tabShortBtn = document.getElementById("tab-short");
   const tabLongBtn = document.getElementById("tab-long");
-  const portfolioGrid = document.getElementById("portfolio-grid");
+  const tabPill = document.getElementById("tab-pill");
+  const gridShort = document.getElementById("portfolio-grid-short");
+  const gridLong = document.getElementById("portfolio-grid-long");
+  const panelsTrack = document.getElementById("portfolio-panels-track");
+  const portfolioGrid = gridShort || document.getElementById("portfolio-grid");
   const videoModal = document.getElementById("video-modal");
   const modalContainer = document.getElementById("modal-media-slot");
   const modalTitle = document.getElementById("modal-title");
   const modalDescription = document.getElementById("modal-description");
   const modalCloseBtn = document.getElementById("modal-close-btn");
   const bookMeBtns = document.querySelectorAll(".btn-book-me-action");
+
+  // ===========================================================================
+  // 0. CINEMATIC HERO ENTRANCE CONTROLLER
+  // ===========================================================================
+  const triggerHeroEntrance = () => {
+    // Wait for the browser to draw the initial frame, then trigger the glide-in
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.documentElement.classList.add("hero-enter");
+
+        // Release classes after all animations complete (1.8s) so all child elements remain 100% interactively free
+        setTimeout(() => {
+          document.documentElement.classList.remove("hero-prep", "hero-enter");
+          document.documentElement.classList.add("hero-done");
+        }, 1800);
+      }, 70);
+    });
+  };
+
+  triggerHeroEntrance();
 
   // ===========================================================================
   // 1. NAVIGATION & SCROLL TRACKING
@@ -71,30 +95,91 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Active Nav Link Spy using IntersectionObserver
-  const sections = document.querySelectorAll("section[id]");
-  const observerOptions = {
-    root: null,
-    rootMargin: "-20% 0px -70% 0px",
-    threshold: 0
-  };
-
-  const navObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute("id");
-        navLinks.forEach((link) => {
-          if (link.getAttribute("href") === `#${id}`) {
-            link.classList.add("active");
-          } else {
-            link.classList.remove("active");
-          }
-        });
+  // Helper to activate a specific nav link by target ID
+  const setActiveNavLink = (targetId) => {
+    if (!targetId) return;
+    navLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === `#${targetId}`) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
       }
     });
-  }, observerOptions);
+  };
 
-  sections.forEach((section) => navObserver.observe(section));
+  // Nav Links Click Handling (Immediate active underline switch + smooth scroll locking)
+  let isNavClickScrolling = false;
+  let navClickTimeout = null;
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      const href = link.getAttribute("href");
+      if (!href || !href.startsWith("#")) return;
+      const targetId = href.substring(1);
+
+      setActiveNavLink(targetId);
+
+      // Lock scroll spy while smooth scrolling occurs
+      isNavClickScrolling = true;
+      clearTimeout(navClickTimeout);
+      navClickTimeout = setTimeout(() => {
+        isNavClickScrolling = false;
+      }, 900);
+    });
+  });
+
+  const navBrand = document.querySelector(".nav-brand");
+  if (navBrand) {
+    navBrand.addEventListener("click", () => {
+      setActiveNavLink("hero");
+      isNavClickScrolling = true;
+      clearTimeout(navClickTimeout);
+      navClickTimeout = setTimeout(() => {
+        isNavClickScrolling = false;
+      }, 900);
+    });
+  }
+
+  // Active Nav Link Spy: Targets ALL sections and footer with an ID
+  const navTargets = document.querySelectorAll("section[id], footer[id]");
+
+  const updateActiveNavOnScroll = () => {
+    if (isNavClickScrolling) return;
+
+    // 1. Detect if scrolled to or near bottom of page -> activate #contact
+    const scrollBottom = window.scrollY + window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    if (documentHeight - scrollBottom <= 100) {
+      setActiveNavLink("contact");
+      return;
+    }
+
+    // 2. Detect section at current scroll position
+    const navBarHeight = navbar ? navbar.offsetHeight : 70;
+    const scrollPosition = window.scrollY + navBarHeight + 60;
+
+    let currentSectionId = null;
+    navTargets.forEach((target) => {
+      const top = target.offsetTop;
+      const height = target.offsetHeight;
+      if (scrollPosition >= top && scrollPosition < top + height) {
+        currentSectionId = target.getAttribute("id");
+      }
+    });
+
+    // If at the very top of the page, default to hero
+    if (window.scrollY < 80) {
+      currentSectionId = "hero";
+    }
+
+    if (currentSectionId) {
+      setActiveNavLink(currentSectionId);
+    }
+  };
+
+  window.addEventListener("scroll", updateActiveNavOnScroll, { passive: true });
+  updateActiveNavOnScroll();
 
   // ===========================================================================
   // 1.5 GLOBAL UTILITIES
@@ -562,7 +647,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateFeatherOverlays = () => {
     const featherLeft = document.getElementById("portfolio-feather-left");
     const featherRight = document.getElementById("portfolio-feather-right");
-    if (!featherLeft || !featherRight || !portfolioGrid) return;
+    const activeScrollEl = gridShort || portfolioGrid;
+    if (!featherLeft || !featherRight || !activeScrollEl) return;
 
     if (currentCategory !== "shortForm") {
       featherLeft.classList.remove("is-visible");
@@ -570,9 +656,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const scrollLeft = portfolioGrid.scrollLeft;
-    const scrollWidth = portfolioGrid.scrollWidth;
-    const clientWidth = portfolioGrid.clientWidth;
+    const scrollLeft = activeScrollEl.scrollLeft;
+    const scrollWidth = activeScrollEl.scrollWidth;
+    const clientWidth = activeScrollEl.clientWidth;
     const maxScroll = scrollWidth - clientWidth;
 
     if (maxScroll <= 8) {
@@ -599,32 +685,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===========================================================================
   // 4. PORTFOLIO TABS & GRID RENDERING
   // ===========================================================================
-  const renderPortfolio = (categoryKey) => {
-    if (!portfolioGrid) return;
-    currentCategory = categoryKey;
+  const renderPortfolio = (categoryKey, targetContainer) => {
+    const container = targetContainer || (categoryKey === "shortForm" ? gridShort : gridLong) || portfolioGrid;
+    if (!container) return;
 
     const items = data.portfolio[categoryKey] || [];
     const isShort = categoryKey === "shortForm";
-
-    // Set grid class: horizontal single row for shortForm, 2 columns for longForm
-    portfolioGrid.className = `portfolio-grid ${isShort ? 'grid-short-form' : 'grid-long-form'}`;
 
     const viewMoreWrap = document.getElementById("portfolio-action-wrap");
     if (viewMoreWrap) {
       viewMoreWrap.style.display = "none";
     }
 
-    const scrollNav = document.getElementById("portfolio-scroll-nav");
-    if (scrollNav) {
-      scrollNav.style.display = isShort ? "flex" : "none";
-    }
-
-    // Reset scroll position on category change
-    portfolioGrid.scrollLeft = 0;
-    requestAnimationFrame(updateFeatherOverlays);
-    setTimeout(updateFeatherOverlays, 80);
-
-    portfolioGrid.innerHTML = items
+    container.innerHTML = items
       .map((item, idx) => {
         if (isShort) {
           // Short-Form: Single horizontal row of all 8 videos, direct autoplaying muted loop video with minimal controls
@@ -795,7 +868,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
 
     // Wire up each card's video and controls (both short-form and long-form)
-    portfolioGrid.querySelectorAll(".portfolio-card").forEach((card) => {
+    container.querySelectorAll(".portfolio-card").forEach((card) => {
       const id = card.dataset.id;
       const project = items.find((p) => p.id === id);
       const video = card.querySelector(".card-video");
@@ -1069,109 +1142,188 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }, { threshold: 0.1 });
 
-      portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
+      container.querySelectorAll(".card-video").forEach((v) => {
         window.portfolioCardObserver.observe(v);
       });
     } catch (err) {}
   };
 
-  // Tab buttons click events
+  // Smooth Segmented Tab Switch Pill Positioner
+  const updateTabPill = (animate = true) => {
+    if (!tabPill) return;
+    const activeBtn = document.querySelector(".tab-group .tab-btn.active");
+    if (!activeBtn) return;
+
+    if (!animate) {
+      tabPill.style.transition = "none";
+    } else {
+      tabPill.style.transition = "transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), width 0.38s cubic-bezier(0.16, 1, 0.3, 1)";
+    }
+
+    tabPill.style.width = `${activeBtn.offsetWidth}px`;
+    tabPill.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  };
+
+  // Smooth Category Switching between Short-Form and Long-Form
+  let trackHeightTimeout = null;
+
+  const switchPortfolioCategory = (categoryKey) => {
+    if (currentCategory === categoryKey) return;
+    const isGoingToLong = categoryKey === "longForm";
+    currentCategory = categoryKey;
+
+    // 1. Update Tab buttons & glide the sliding pill
+    if (tabShortBtn && tabLongBtn) {
+      if (isGoingToLong) {
+        tabLongBtn.classList.add("active");
+        tabLongBtn.setAttribute("aria-selected", "true");
+        tabShortBtn.classList.remove("active");
+        tabShortBtn.setAttribute("aria-selected", "false");
+      } else {
+        tabShortBtn.classList.add("active");
+        tabShortBtn.setAttribute("aria-selected", "true");
+        tabLongBtn.classList.remove("active");
+        tabLongBtn.setAttribute("aria-selected", "false");
+      }
+      updateTabPill(true);
+    }
+
+    if (!gridShort || !gridLong || !panelsTrack) return;
+
+    const outgoingPanel = isGoingToLong ? gridShort : gridLong;
+    const incomingPanel = isGoingToLong ? gridLong : gridShort;
+
+    // 2. Animate container height smoothly
+    const startHeight = outgoingPanel.offsetHeight;
+    const prevPos = incomingPanel.style.position;
+    const prevVis = incomingPanel.style.visibility;
+    incomingPanel.style.position = "static";
+    incomingPanel.style.visibility = "hidden";
+    const targetHeight = incomingPanel.offsetHeight;
+    incomingPanel.style.position = prevPos;
+    incomingPanel.style.visibility = prevVis;
+
+    panelsTrack.style.height = `${startHeight}px`;
+    void panelsTrack.offsetHeight; // force reflow
+    panelsTrack.style.transition = "height 0.45s cubic-bezier(0.16, 1, 0.3, 1)";
+    panelsTrack.style.height = `${targetHeight}px`;
+
+    // 3. Smooth sliding panel motion
+    if (isGoingToLong) {
+      // Short-form glides out to the left
+      outgoingPanel.classList.remove("is-active", "is-hidden-right");
+      outgoingPanel.classList.add("is-hidden-left");
+
+      // Long-form glides in from the right
+      incomingPanel.classList.remove("is-hidden-left", "is-hidden-right");
+      incomingPanel.classList.add("is-active");
+
+      // Pause outgoing videos
+      outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
+
+      // Play visible incoming videos
+      incomingPanel.querySelectorAll(".card-video").forEach((v) => {
+        v.muted = true;
+        v.play().catch(() => {});
+      });
+    } else {
+      // Long-form glides out to the right
+      outgoingPanel.classList.remove("is-active", "is-hidden-left");
+      outgoingPanel.classList.add("is-hidden-right");
+
+      // Short-form glides in from the left
+      incomingPanel.classList.remove("is-hidden-left", "is-hidden-right");
+      incomingPanel.classList.add("is-active");
+
+      // Pause outgoing videos
+      outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
+
+      // Play visible incoming videos
+      incomingPanel.querySelectorAll(".card-video").forEach((v) => {
+        v.muted = true;
+        v.play().catch(() => {});
+      });
+    }
+
+    // 4. Update feather overlays
+    updateFeatherOverlays();
+
+    // Release height lock after animation
+    clearTimeout(trackHeightTimeout);
+    trackHeightTimeout = setTimeout(() => {
+      panelsTrack.style.height = "auto";
+    }, 460);
+  };
+
+  // Wire up Tab Button Click Handlers
   if (tabShortBtn && tabLongBtn) {
     tabShortBtn.addEventListener("click", () => {
-      tabShortBtn.classList.add("active");
-      tabLongBtn.classList.remove("active");
-      isShortFormExpanded = false;
-      renderPortfolio("shortForm");
+      switchPortfolioCategory("shortForm");
     });
 
     tabLongBtn.addEventListener("click", () => {
-      tabLongBtn.classList.add("active");
-      tabShortBtn.classList.remove("active");
-      isShortFormExpanded = false;
-      renderPortfolio("longForm");
+      switchPortfolioCategory("longForm");
     });
   }
 
-  // Horizontal carousel scroll buttons for short-form
-  const btnScrollLeft = document.getElementById("btn-scroll-left");
-  const btnScrollRight = document.getElementById("btn-scroll-right");
-
-  if (btnScrollLeft && portfolioGrid) {
-    btnScrollLeft.addEventListener("click", () => {
-      const scrollStep = portfolioGrid.clientWidth * 0.75;
-      portfolioGrid.scrollBy({ left: -scrollStep, behavior: "smooth" });
-    });
-  }
-
-  if (btnScrollRight && portfolioGrid) {
-    btnScrollRight.addEventListener("click", () => {
-      const scrollStep = portfolioGrid.clientWidth * 0.75;
-      portfolioGrid.scrollBy({ left: scrollStep, behavior: "smooth" });
-    });
-  }
-
-  // Smooth mouse drag-to-scroll for desktop short-form single row
+  // Smooth mouse drag-to-scroll for desktop short-form horizontal single row
   let isGridDragging = false;
   let gridStartX = 0;
   let gridInitialScrollLeft = 0;
 
-  if (portfolioGrid) {
-    portfolioGrid.addEventListener("mousedown", (e) => {
+  if (gridShort) {
+    gridShort.addEventListener("mousedown", (e) => {
       if (currentCategory !== "shortForm") return;
       if (e.target.closest("button") || e.target.closest(".ctrl-timeline-wrap")) return;
       isGridDragging = true;
       isCardDragScroll = false;
-      gridStartX = e.pageX - portfolioGrid.offsetLeft;
-      gridInitialScrollLeft = portfolioGrid.scrollLeft;
-      portfolioGrid.classList.add("is-dragging");
+      gridStartX = e.pageX - gridShort.offsetLeft;
+      gridInitialScrollLeft = gridShort.scrollLeft;
+      gridShort.classList.add("is-dragging");
     });
 
     window.addEventListener("mouseup", () => {
       if (isGridDragging) {
         isGridDragging = false;
-        if (portfolioGrid) portfolioGrid.classList.remove("is-dragging");
+        if (gridShort) gridShort.classList.remove("is-dragging");
         setTimeout(() => {
           isCardDragScroll = false;
         }, 50);
       }
     });
 
-    portfolioGrid.addEventListener("mousemove", (e) => {
+    gridShort.addEventListener("mousemove", (e) => {
       if (!isGridDragging || currentCategory !== "shortForm") return;
-      const currentX = e.pageX - portfolioGrid.offsetLeft;
+      const currentX = e.pageX - gridShort.offsetLeft;
       const walk = (currentX - gridStartX) * 1.5;
       if (Math.abs(walk) > 6) {
         isCardDragScroll = true;
       }
-      portfolioGrid.scrollLeft = gridInitialScrollLeft - walk;
+      gridShort.scrollLeft = gridInitialScrollLeft - walk;
     });
 
-    portfolioGrid.addEventListener("scroll", updateFeatherOverlays, { passive: true });
-    window.addEventListener("resize", updateFeatherOverlays, { passive: true });
+    gridShort.addEventListener("scroll", updateFeatherOverlays, { passive: true });
+    window.addEventListener("resize", () => {
+      updateFeatherOverlays();
+      updateTabPill(false);
+    }, { passive: true });
   }
 
-  // View More Button click event
-  const viewMoreBtn = document.getElementById("btn-view-more");
-  if (viewMoreBtn) {
-    viewMoreBtn.addEventListener("click", () => {
-      isShortFormExpanded = !isShortFormExpanded;
-      renderPortfolio(currentCategory);
-
-      if (isShortFormExpanded) {
-        // Ensure newly revealed videos start playing
-        portfolioGrid.querySelectorAll(".card-revealed .card-video").forEach((v) => {
-          v.muted = true;
-          v.play().catch(() => {});
-        });
-      } else {
-        // Smoothly scroll back to top of portfolio grid
-        portfolioGrid.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
+  // Populate Both Portfolio Panels at Startup
+  if (gridShort) {
+    renderPortfolio("shortForm", gridShort);
   }
 
-  // Initial Portfolio Render (Short-form by default)
-  renderPortfolio("shortForm");
+  if (gridLong) {
+    renderPortfolio("longForm", gridLong);
+  }
+
+  // Position pill immediately on load
+  updateTabPill(false);
+  setTimeout(() => updateTabPill(false), 60);
+  setTimeout(() => updateTabPill(false), 250);
+
+  updateFeatherOverlays();
 
   // ===========================================================================
   // 4.5. RAW → FINAL INTERACTIVE COMPARISON SLIDER (VERTICAL 9:16)
@@ -1207,35 +1359,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (rfConfig.title) {
           const titleEl = rfSection.querySelector(".section-title");
-          if (titleEl) titleEl.textContent = rfConfig.title;
+          if (titleEl) {
+            titleEl.innerHTML = rfConfig.title.includes("rf-title-arrow")
+              ? rfConfig.title
+              : rfConfig.title.replace("→", '<span class="rf-title-arrow">→</span>');
+          }
         }
         if (rfConfig.subtitle) {
           const subEl = rfSection.querySelector(".section-subtext");
           if (subEl) {
-            if (rfConfig.subtitle.includes("<br>")) {
-              subEl.innerHTML = rfConfig.subtitle;
-            } else if (rfConfig.subtitle.includes(". ")) {
-              subEl.innerHTML = rfConfig.subtitle.replace(". ", ".<br>");
-            } else {
-              subEl.textContent = rfConfig.subtitle;
-            }
+            subEl.textContent = rfConfig.subtitle;
           }
-        }
-        if (rfConfig.finalLabel) {
-          const finalTitle = rfSection.querySelector(".rf-ext-final .rf-ext-title");
-          if (finalTitle) finalTitle.textContent = rfConfig.finalLabel;
-        }
-        if (rfConfig.finalDesc) {
-          const finalDesc = rfSection.querySelector(".rf-ext-final .rf-ext-desc");
-          if (finalDesc) finalDesc.textContent = rfConfig.finalDesc;
-        }
-        if (rfConfig.rawLabel) {
-          const rawTitle = rfSection.querySelector(".rf-ext-raw .rf-ext-title");
-          if (rawTitle) rawTitle.textContent = rfConfig.rawLabel;
-        }
-        if (rfConfig.rawDesc) {
-          const rawDesc = rfSection.querySelector(".rf-ext-raw .rf-ext-desc");
-          if (rawDesc) rawDesc.textContent = rfConfig.rawDesc;
         }
       }
 
@@ -1480,9 +1614,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const onSplitPointerMove = (e) => {
       if (!isDraggingSplit) return;
-      e.preventDefault();
       const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       calcSplitFromClientX(clientX);
+      if (window.updateCustomCursor) {
+        window.updateCustomCursor(clientX, clientY);
+      }
     };
 
     const onSplitPointerUp = (e) => {
@@ -1501,7 +1638,6 @@ document.addEventListener("DOMContentLoaded", () => {
     rfStage.addEventListener("pointerdown", (e) => {
       // Ignore clicks on bottom controls or timeline
       if (e.target.closest(".rf-controls")) return;
-      e.preventDefault();
       isDraggingSplit = true;
       rfStage.classList.add("is-dragging");
 
@@ -1510,12 +1646,23 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {}
 
       const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       calcSplitFromClientX(clientX);
+      if (window.updateCustomCursor) {
+        window.updateCustomCursor(clientX, clientY);
+      }
 
-      window.addEventListener("pointermove", onSplitPointerMove, { passive: false });
+      window.addEventListener("pointermove", onSplitPointerMove, { passive: true });
       window.addEventListener("pointerup", onSplitPointerUp);
       window.addEventListener("pointercancel", onSplitPointerUp);
     });
+
+    // Also listen on rfStage directly for captured pointer moves
+    rfStage.addEventListener("pointermove", (e) => {
+      if (isDraggingSplit) {
+        onSplitPointerMove(e);
+      }
+    }, { passive: true });
 
     // Keyboard support on vertical divider (Left / Right arrows)
     if (rfDivider) {
@@ -1642,8 +1789,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const onTimelineMove = (moveEvt) => {
         if (!isScrubbingTimeline) return;
-        moveEvt.preventDefault();
         handleTimelineScrub(moveEvt, false);
+        if (window.updateCustomCursor && moveEvt.clientX !== undefined) {
+          window.updateCustomCursor(moveEvt.clientX, moveEvt.clientY);
+        }
       };
 
       const onTimelineUp = (upEvt) => {
@@ -1664,7 +1813,6 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       rfTimelineWrap.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
         e.stopPropagation();
         isScrubbingTimeline = true;
         rfTimelineWrap.classList.add("is-dragging");
@@ -1674,8 +1822,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {}
 
         handleTimelineScrub(e, false);
+        if (window.updateCustomCursor && e.clientX !== undefined) {
+          window.updateCustomCursor(e.clientX, e.clientY);
+        }
 
-        window.addEventListener("pointermove", onTimelineMove, { passive: false });
+        window.addEventListener("pointermove", onTimelineMove, { passive: true });
         window.addEventListener("pointerup", onTimelineUp);
         window.addEventListener("pointercancel", onTimelineUp);
       });
@@ -2248,8 +2399,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (rfVideoRaw) rfVideoRaw.currentTime = modalCurrentTime;
           if (rfVideoFinal) rfVideoFinal.currentTime = modalCurrentTime;
         } catch (e) {}
-      } else if (portfolioGrid) {
-        const activeCardVid = portfolioGrid.querySelector(`[data-id="${activeModalProject.id}"] .card-video`);
+      } else {
+        const activeCardVid = document.querySelector(`.portfolio-card[data-id="${activeModalProject.id}"] .card-video`);
         if (activeCardVid) {
           try {
             activeCardVid.currentTime = modalCurrentTime;
@@ -2258,12 +2409,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 3. Resume inline looping videos (portfolio cards and raw-final)
+    // 3. Resume inline looping videos in active panel (portfolio cards and raw-final)
     if (activeModalProject && activeModalProject.id === "showreel" && showreelVideo) {
       showreelVideo.play().catch(() => {});
     }
-    if (portfolioGrid) {
-      portfolioGrid.querySelectorAll(".card-video").forEach((v) => {
+    const activePanel = document.querySelector(".portfolio-panel.is-active");
+    if (activePanel) {
+      activePanel.querySelectorAll(".card-video").forEach((v) => {
         if (v.paused) {
           v.muted = true;
           v.play().catch(() => {});
@@ -2368,6 +2520,23 @@ document.addEventListener("DOMContentLoaded", () => {
       p.setAttribute("href", `tel:${phone.replace(/[^0-9+]/g, "")}`);
     });
 
+    // Ensure WhatsApp links direct to WhatsApp chat
+    const whatsapp = (data.personal && data.personal.whatsapp) || phone;
+    const cleanWaNumber = whatsapp.replace(/[^0-9]/g, "");
+    const defaultWaUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent("Hi Naresh, I saw your portfolio and would like to connect!")}`;
+    const whatsappUrl = (data.personal && data.personal.whatsappLink) || defaultWaUrl;
+
+    const whatsappLinks = document.querySelectorAll(".link-whatsapp");
+    whatsappLinks.forEach((w) => {
+      w.setAttribute("href", whatsappUrl);
+      w.setAttribute("target", "_blank");
+      w.setAttribute("rel", "noopener noreferrer");
+      const valSpan = w.querySelector(".contact-card-val");
+      if (valSpan) {
+        valSpan.textContent = (data.personal && data.personal.whatsappDisplay) || "Message me";
+      }
+    });
+
     // Social links (LinkedIn)
     const linkedinLinks = document.querySelectorAll(".link-linkedin");
     linkedinLinks.forEach((l) => {
@@ -2380,144 +2549,133 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBookingLinks();
 
   // ===========================================================================
-  // 8. FLUID GOOEY CURSOR & TOUCH FLOW (MATCHING AKIMAFILMS.COM)
+  // 8. CUSTOM CURSOR & TRAILING RING (INSPIRED BY ALIHOSSAIN.COM)
   // ===========================================================================
   const initCustomCursor = () => {
-    const cursor = document.getElementById("cursor");
-    if (!cursor) return;
+    const supportsFinePointer =
+      window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
 
-    const TAIL_LENGTH = 20;
-    let mouseX = -100;
-    let mouseY = -100;
-    let hasMoved = false;
+    if (!supportsFinePointer || !cursor || !ring) return;
+
+    let mx = -100;
+    let my = -100;
+    let rx = -100;
+    let ry = -100;
     let isVisible = false;
-    let touchFadeTimer = null;
+    let isHovering = false;
 
-    // Initialize array of trailing position objects
-    const cursorHistory = [];
-    for (let i = 0; i < TAIL_LENGTH; i++) {
-      cursorHistory.push({ x: -100, y: -100 });
-    }
-
-    // Create 20 cursor circle elements
-    cursor.innerHTML = "";
-    for (let i = 0; i < TAIL_LENGTH; i++) {
-      const div = document.createElement("div");
-      div.className = "cursor-circle";
-      cursor.appendChild(div);
-    }
-    const cursorCircles = Array.from(cursor.querySelectorAll(".cursor-circle"));
-
-    const setPosition = (x, y) => {
-      mouseX = x;
-      mouseY = y;
-
-      if (!hasMoved) {
-        hasMoved = true;
-        for (let i = 0; i < TAIL_LENGTH; i++) {
-          cursorHistory[i].x = mouseX;
-          cursorHistory[i].y = mouseY;
-        }
-      }
+    // Direct cursor updater exposed globally so slider and dragging gestures feed coordinates seamlessly
+    const updateCursorPos = (clientX, clientY) => {
+      if (typeof clientX !== 'number' || typeof clientY !== 'number' || isNaN(clientX) || isNaN(clientY)) return;
+      mx = clientX;
+      my = clientY;
 
       if (!isVisible) {
         isVisible = true;
-        cursor.classList.add("cursor-visible");
+        rx = mx;
+        ry = my;
+        cursor.classList.add('cursor-visible');
+        ring.classList.add('cursor-visible');
       }
+
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
     };
 
-    // 1. Mouse Tracking (Desktop)
-    window.addEventListener("pointermove", (e) => {
-      if (e.pointerType === "touch") return; // Handled by touch events
-      setPosition(e.clientX, e.clientY);
-    }, { passive: true });
+    window.updateCustomCursor = updateCursorPos;
 
-    // 2. Touch Flow Tracking (Mobile / Tablet Touch)
-    window.addEventListener("touchstart", (e) => {
-      if (touchFadeTimer) clearTimeout(touchFadeTimer);
-      if (e.touches && e.touches[0]) {
-        const t = e.touches[0];
-        mouseX = t.clientX;
-        mouseY = t.clientY;
-        // Snap trailing points to the touch point so flow emerges naturally
-        for (let i = 0; i < TAIL_LENGTH; i++) {
-          cursorHistory[i].x = mouseX;
-          cursorHistory[i].y = mouseY;
+    // Follow pointer position instantly across all input and dragging events
+    const onPointerMove = (e) => {
+      updateCursorPos(e.clientX, e.clientY);
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('mousemove', onPointerMove, { passive: true });
+    document.addEventListener('pointermove', onPointerMove, { passive: true });
+    document.addEventListener('mousemove', onPointerMove, { passive: true });
+    window.addEventListener('dragover', onPointerMove, { passive: true });
+
+    // Smooth lerp easing for trailing outer ring (0.12 factor matching alihossain.com)
+    const animRing = () => {
+      if (isVisible) {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+      }
+      requestAnimationFrame(animRing);
+    };
+
+    requestAnimationFrame(animRing);
+
+    // Interactive element hover detection (event delegation handles all current & dynamic nodes)
+    const interactiveSelector =
+      'a, button, [role="button"], [role="slider"], input, textarea, select, ' +
+      '.filter-chip, .tab-btn, .portfolio-card, .video-card, .showreel-frame, ' +
+      '.carousel-btn, .modal-close-floating, .brand-logo, .nav-link, .cta-button, ' +
+      '.theme-toggle, .contact-method-card, label[for], .rf-stage, .rf-divider-vertical, ' +
+      '.rf-handle-round, .rf-video-window, .ctrl-timeline-wrap, [data-cursor="hover"]';
+
+    document.addEventListener('mouseover', (e) => {
+      if (e.target && e.target.closest(interactiveSelector)) {
+        if (!isHovering) {
+          isHovering = true;
+          cursor.classList.add('cursor-hover');
+          ring.classList.add('cursor-hover');
         }
-        hasMoved = true;
-        isVisible = true;
-        cursor.classList.add("cursor-visible");
       }
     }, { passive: true });
 
-    window.addEventListener("touchmove", (e) => {
-      if (touchFadeTimer) clearTimeout(touchFadeTimer);
-      if (e.touches && e.touches[0]) {
-        const t = e.touches[0];
-        setPosition(t.clientX, t.clientY);
+    document.addEventListener('mouseout', (e) => {
+      if (e.target && e.target.closest(interactiveSelector)) {
+        const nextTarget = e.relatedTarget;
+        if (!nextTarget || !nextTarget.closest(interactiveSelector)) {
+          isHovering = false;
+          cursor.classList.remove('cursor-hover');
+          ring.classList.remove('cursor-hover');
+        }
       }
     }, { passive: true });
 
-    const onTouchEnd = () => {
-      if (touchFadeTimer) clearTimeout(touchFadeTimer);
-      touchFadeTimer = setTimeout(() => {
-        isVisible = false;
-        cursor.classList.remove("cursor-visible");
-      }, 400);
-    };
+    // Tactile Click Compression on all pointer events
+    document.addEventListener('pointerdown', (e) => {
+      updateCursorPos(e.clientX, e.clientY);
+      cursor.classList.add('cursor-clicking');
+      ring.classList.add('cursor-clicking');
+    }, { passive: true });
 
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    document.addEventListener('pointerup', () => {
+      cursor.classList.remove('cursor-clicking');
+      ring.classList.remove('cursor-clicking');
+    }, { passive: true });
+
+    document.addEventListener('mousedown', (e) => {
+      updateCursorPos(e.clientX, e.clientY);
+      cursor.classList.add('cursor-clicking');
+      ring.classList.add('cursor-clicking');
+    }, { passive: true });
+
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('cursor-clicking');
+      ring.classList.remove('cursor-clicking');
+    }, { passive: true });
 
     // Viewport enter / leave listeners
-    document.addEventListener("mouseleave", () => {
+    document.addEventListener('mouseleave', () => {
       isVisible = false;
-      cursor.classList.remove("cursor-visible");
+      cursor.classList.remove('cursor-visible');
+      ring.classList.remove('cursor-visible');
     });
 
-    document.addEventListener("mouseenter", () => {
-      if (hasMoved) {
+    document.addEventListener('mouseenter', () => {
+      if (mx > -50 && my > -50) {
         isVisible = true;
-        cursor.classList.add("cursor-visible");
+        cursor.classList.add('cursor-visible');
+        ring.classList.add('cursor-visible');
       }
     });
-
-    // Hover detection on interactive elements
-    const interactiveSelector = "a, button, [role='button'], [role='slider'], .rf-handle-round, input, textarea, select, .progress-bar-container, .showreel-frame, .portrait-frame";
-    document.addEventListener("mouseover", (e) => {
-      if (e.target && e.target.closest(interactiveSelector)) {
-        cursor.classList.add("cursor-hover");
-      }
-    }, { passive: true });
-
-    document.addEventListener("mouseout", (e) => {
-      if (e.target && e.target.closest(interactiveSelector)) {
-        cursor.classList.remove("cursor-hover");
-      }
-    }, { passive: true });
-
-    // Animation loop: exact akimafilms.com fluid physics
-    function updateCursor() {
-      if (hasMoved) {
-        cursorHistory.shift();
-        cursorHistory.push({ x: mouseX, y: mouseY });
-
-        for (let i = 0; i < TAIL_LENGTH; i++) {
-          const current = cursorHistory[i];
-          const next = cursorHistory[i + 1] || cursorHistory[TAIL_LENGTH - 1];
-          const xDiff = next.x - current.x;
-          const yDiff = next.y - current.y;
-          current.x += xDiff * 0.35;
-          current.y += yDiff * 0.35;
-          const scale = (i + 1) / TAIL_LENGTH;
-          cursorCircles[i].style.transform = `translate3d(${current.x}px, ${current.y}px, 0) scale(${scale})`;
-        }
-      }
-
-      requestAnimationFrame(updateCursor);
-    }
-
-    requestAnimationFrame(updateCursor);
   };
 
   initCustomCursor();

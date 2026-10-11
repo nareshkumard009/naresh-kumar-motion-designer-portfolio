@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" fill="none">
+  <defs>
+    <linearGradient id="bgShort" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1017"/>
+      <stop offset="50%" stop-color="#0a0b0e"/>
+      <stop offset="100%" stop-color="#141622"/>
+    </linearGradient>
+    <radialGradient id="glowShort" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e5a93c" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#e5a93c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1920" fill="url(#bgShort)"/>
+  <rect width="1080" height="1920" fill="url(#glowShort)"/>
+
+  <!-- Outer HUD Corner Brackets -->
+  <path d="M 60 120 L 60 60 L 120 60" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 1020 120 L 1020 60 L 960 60" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 60 1800 L 60 1860 L 120 1860" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 1020 1800 L 1020 1860 L 960 1860" stroke="#e5a93c" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Technical Marks -->
+  <text x="60" y="42" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, monospace" font-size="14" letter-spacing="3" fill="#717585">REC // 9:16 VERTICAL</text>
+  <text x="1020" y="42" text-anchor="end" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, monospace" font-size="14" letter-spacing="3" fill="#e5a93c">60 FPS · HIGH RETENTION</text>
+
+  <!-- Center Play Graphic -->
+  <circle cx="540" cy="900" r="76" stroke="#2a2d3d" stroke-width="2" fill="#12141c"/>
+  <polygon points="530,870 565,900 530,930" fill="#e5a93c"/>
+
+  <!-- Center Title -->
+  <text x="540" y="1030" text-anchor="middle" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif" font-size="28" font-weight="700" letter-spacing="5" fill="#f4f5f8">SHORT-FORM REEL</text>
+  <text x="540" y="1070" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" letter-spacing="3" fill="#8a8e9e">DYNAMIC PACING · MOTION GRAPHICS</text>
+  <text x="540" y="1110" text-anchor="middle" font-family="monospace" font-size="13" letter-spacing="2" fill="#525666">1080×1920 // VERTICAL EDIT</text>
+</svg>

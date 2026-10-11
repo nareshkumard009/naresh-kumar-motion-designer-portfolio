@@ -29,9 +29,13 @@ const portfolioData = {
     role: "Video Editor & Motion Designer",
     location: "Hyderabad, India",
     status: "Available for freelance projects",
+    coreSkills: "Motion Graphics · Storytelling<br />Color Grading · Sound Design",
     // Replace with your real email and phone number:
     email: "nareshkumard009@gmail.com",
     phone: "+91 9177421780",
+    whatsapp: "+91 9177421780",
+    whatsappDisplay: "Message me",
+    whatsappLink: "https://wa.me/919177421780?text=Hi%20Naresh,%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20connect!",
     profileImage: "public/images/profile.jpg",
     fallbackProfileImage: "public/images/placeholder-profile.svg",
     socials: {
@@ -45,7 +49,7 @@ const portfolioData = {
   // ---------------------------------------------------------------------------
   stats: [
     { value: 2, suffix: "+", label: "Years Experience" },
-    { value: 25, suffix: "+", label: "Brands & Projects" },
+    { value: 25, suffix: "+", label: "Brands" },
     { value: 300, suffix: "+", label: "Videos Edited" }
   ],
 
@@ -251,6 +255,32 @@ const portfolioData = {
         videoType: "mp4",
         embedUrl: "",
         description: "Story-first long-form pacing, atmospheric soundscapes, and color grading in DaVinci Resolve."
+      },
+      {
+        id: "long-05",
+        title: "Brand Film: Studio Craft & Heritage",
+        category: "Brand Documentary",
+        aspectRatio: "16:9",
+        duration: "08:45",
+        thumbnail: "public/thumbnails/long-05.jpg",
+        fallbackThumbnail: "public/thumbnails/placeholder-long.svg",
+        videoUrl: "public/videos/long-05.mp4",
+        videoType: "mp4",
+        embedUrl: "",
+        description: "Rich cinematic narrative pacing, macro footage treatment, tailored color palette in DaVinci Resolve, and immersive soundscapes."
+      },
+      {
+        id: "long-06",
+        title: "Video Essay: The Art of Visual Storytelling",
+        category: "Video Essay",
+        aspectRatio: "16:9",
+        duration: "16:20",
+        thumbnail: "public/thumbnails/long-06.jpg",
+        fallbackThumbnail: "public/thumbnails/placeholder-long.svg",
+        videoUrl: "public/videos/long-06.mp4",
+        videoType: "mp4",
+        embedUrl: "",
+        description: "Kinetic title sequencing, multi-camera audio mastering, archival motion design, and rhythmic documentary flow."
       }
     ]
   },
@@ -265,14 +295,10 @@ const portfolioData = {
   // (Both videos should ideally have matching timing/duration for perfect lockstep sync).
   rawFinal: {
     tag: "04 // The Edit Process",
-    title: "RAW → FINAL",
-    subtitle: "I shape raw footage into compelling visual stories.<br>Through precise editing, motion and color, every frame finds its purpose.",
+    title: 'RAW <span class="rf-title-arrow">→</span> FINAL',
+    subtitle: "From raw footage to a refined visual experience.",
     rawVideo: "public/videos/raw video.mp4",
     finalVideo: "public/videos/final output.mp4",
-    rawLabel: "RAW FOOTAGE",
-    rawDesc: "",
-    finalLabel: "FINAL OUTPUT",
-    finalDesc: "",
     aspectRatio: "9:16"
   },
 

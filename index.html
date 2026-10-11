@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Naresh Kumar — Video Editor &amp; Motion Designer</title>
 
-  
+
   <!-- SEO Meta Tags -->
   <meta name="description"
     content="Portfolio of Naresh Kumar, a Video Editor &amp; Motion Designer creating engaging short-form, long-form and branded video content." />
@@ -30,11 +30,31 @@
   <!-- Favicon / Theme -->
   <meta name="theme-color" content="#0a0b0e" />
 
+  <!-- Google Fonts: Plus Jakarta Sans (SpaceKey Digital Design System) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    // Prepare hero elements immediately so the entrance animation is distinctly visible on load
+    try {
+      document.documentElement.classList.add('hero-prep');
+    } catch (e) {}
+  </script>
+
   <!-- Preload Styles & Scripts -->
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=2.6" />
 </head>
 
 <body>
+
+  <!-- Deep Obsidian & Refined Warm Gold Ambient Backdrop -->
+  <div class="ambient-gradient-mesh" aria-hidden="true">
+    <div class="ambient-glow glow-top"></div>
+    <div class="ambient-glow glow-middle"></div>
+    <div class="ambient-glow glow-bottom"></div>
+  </div>
 
   <!-- =========================================================================
        NAVIGATION BAR
@@ -52,13 +72,20 @@
           <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#brands" class="nav-link">Brands</a></li>
           <li><a href="#work" class="nav-link">Work</a></li>
-          <li><a href="#raw-final" class="nav-link">RAW → FINAL</a></li>
+          <li><a href="#raw-final" class="nav-link">RAW <span class="nav-rf-arrow">→</span> FINAL</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
 
       <!-- Nav CTA / Mobile Toggle -->
       <div class="nav-cta">
+        <a href="#contact" class="btn btn-primary btn-sm nav-btn-cta">
+          <span>Let's Talk</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
         <button class="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
           <span></span>
           <span></span>
@@ -73,7 +100,7 @@
       <a href="#about" class="nav-link">About</a>
       <a href="#brands" class="nav-link">Brands</a>
       <a href="#work" class="nav-link">Work</a>
-      <a href="#raw-final" class="nav-link">RAW → FINAL</a>
+      <a href="#raw-final" class="nav-link">RAW <span class="nav-rf-arrow">→</span> FINAL</a>
       <a href="#contact" class="nav-link">Contact</a>
     </div>
   </header>
@@ -85,15 +112,30 @@
     <section id="hero" class="hero-section">
       <div class="container">
         <div class="hero-content">
-
           <h1 class="hero-headline">
             Video Editor<br />
-            &amp; Motion Designer
+            <span class="text-accent-gradient">&amp; Motion Designer</span>
           </h1>
 
           <p class="hero-subtext">
-            I turn footage, ideas and concepts into engaging visual stories.
+            Turning raw footage, high-level ideas, and bold concepts into captivating, high-retention visual stories.
           </p>
+
+          <div class="hero-actions">
+            <a href="#work" class="btn btn-primary">
+              <span>Explore Projects</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+            <a href="#contact" class="btn btn-secondary">
+              <span>Get in Touch</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </a>
+          </div>
         </div>
 
         <!-- Dominant Cinematic Showreel Player -->
@@ -188,7 +230,7 @@
     <!-- =======================================================================
          2. ABOUT ME SECTION
          ======================================================================= -->
-    <section id="about" class="section-padding" style="background-color: var(--bg-surface);">
+    <section id="about" class="section-padding">
       <div class="container">
         <div class="section-header">
           <div class="section-tag">01 // Profile</div>
@@ -234,11 +276,11 @@
             </div>
             <div class="spec-tile">
               <span class="spec-label"><span class="spec-dot"></span>Specialization</span>
-              <span class="spec-value">Short-Form &amp; Long-Form Editing</span>
+              <span class="spec-value">Short Form &amp; Long Form Editing</span>
             </div>
             <div class="spec-tile">
               <span class="spec-label"><span class="spec-dot"></span>Core Skills</span>
-              <span class="spec-value">Motion Graphics · Color Grading · Sound Design</span>
+              <span class="spec-value">Motion Graphics · Storytelling<br />Color Grading · Sound Design</span>
             </div>
             <div class="spec-tile">
               <span class="spec-label"><span class="spec-dot"></span>Education</span>
@@ -256,7 +298,8 @@
             <!-- 1. After Effects -->
             <div class="tool-box tool-ae">
               <div class="tool-logo-wrap">
-                <img src="public/logos/tool-aftereffects.svg" alt="After Effects Logo" width="48" height="48" loading="lazy" />
+                <img src="public/logos/tool-aftereffects.svg" alt="After Effects Logo" width="48" height="48"
+                  loading="lazy" />
               </div>
               <div class="tool-details">
                 <span class="tool-name">After Effects</span>
@@ -266,7 +309,8 @@
             <!-- 2. Premiere Pro -->
             <div class="tool-box tool-pr">
               <div class="tool-logo-wrap">
-                <img src="public/logos/tool-premiere.svg" alt="Premiere Pro Logo" width="48" height="48" loading="lazy" />
+                <img src="public/logos/tool-premiere.svg" alt="Premiere Pro Logo" width="48" height="48"
+                  loading="lazy" />
               </div>
               <div class="tool-details">
                 <span class="tool-name">Premiere Pro</span>
@@ -276,7 +320,8 @@
             <!-- 3. DaVinci Resolve -->
             <div class="tool-box tool-dv">
               <div class="tool-logo-wrap">
-                <img src="public/logos/tool-davinci.svg" alt="DaVinci Resolve Logo" width="48" height="48" loading="lazy" />
+                <img src="public/logos/tool-davinci.svg" alt="DaVinci Resolve Logo" width="48" height="48"
+                  loading="lazy" />
               </div>
               <div class="tool-details">
                 <span class="tool-name">DaVinci Resolve</span>
@@ -304,7 +349,7 @@
           <div class="stat-divider" aria-hidden="true"></div>
           <div class="stat-item">
             <span class="stat-number" data-target="25" data-suffix="+">25+</span>
-            <span class="stat-label">Brands &amp; Projects</span>
+            <span class="stat-label">Brands</span>
           </div>
           <div class="stat-divider" aria-hidden="true"></div>
           <div class="stat-item">
@@ -341,38 +386,36 @@
           <div class="section-tag">03 // Selected Projects</div>
           <h2 class="section-title">My Work</h2>
 
-          <!-- Exact Two Categories Tabs & Scroll Navigation -->
+          <!-- Exact Two Categories Tabs (Smooth Sliding Segmented Switch) -->
           <div class="portfolio-controls-row">
             <div class="tab-group" role="tablist" aria-label="Portfolio Categories">
+              <div class="tab-pill" id="tab-pill" aria-hidden="true"></div>
               <button id="tab-short" class="tab-btn active" role="tab" aria-selected="true"
-                aria-controls="portfolio-grid">
+                aria-controls="portfolio-grid-short">
                 Short-Form
               </button>
-              <button id="tab-long" class="tab-btn" role="tab" aria-selected="false" aria-controls="portfolio-grid">
+              <button id="tab-long" class="tab-btn" role="tab" aria-selected="false"
+                aria-controls="portfolio-grid-long">
                 Long-Form
-              </button>
-            </div>
-
-            <!-- Horizontal Carousel Navigation Arrows (Short-Form) -->
-            <div class="portfolio-scroll-nav" id="portfolio-scroll-nav" aria-label="Scroll projects">
-              <button class="portfolio-nav-btn" id="btn-scroll-left" aria-label="Scroll left" title="Scroll left">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-              <button class="portfolio-nav-btn" id="btn-scroll-right" aria-label="Scroll right" title="Scroll right">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Portfolio Grid with Subtle Feathered Vignette Overlays -->
+        <!-- Dynamic Portfolio Viewport with Smooth Sliding Dual-Panel Track & Feathered Vignettes -->
         <div class="portfolio-carousel-wrapper" id="portfolio-carousel-wrapper">
           <div class="portfolio-feather-overlay feather-left" id="portfolio-feather-left" aria-hidden="true"></div>
-          <div id="portfolio-grid" class="portfolio-grid grid-short-form" role="tabpanel"></div>
+
+          <div class="portfolio-panels-track" id="portfolio-panels-track">
+            <!-- Short-Form Panel (Horizontal single row of reels, active by default) -->
+            <div id="portfolio-grid-short" class="portfolio-grid grid-short-form portfolio-panel is-active"
+              role="tabpanel" aria-labelledby="tab-short"></div>
+
+            <!-- Long-Form Panel (2-column widescreen grid, starts hidden to the right) -->
+            <div id="portfolio-grid-long" class="portfolio-grid grid-long-form portfolio-panel is-hidden-right"
+              role="tabpanel" aria-labelledby="tab-long"></div>
+          </div>
+
           <div class="portfolio-feather-overlay feather-right" id="portfolio-feather-right" aria-hidden="true"></div>
         </div>
 
@@ -394,30 +437,18 @@
          ======================================================================= -->
     <section id="raw-final" class="section-padding raw-final-section">
       <div class="container">
-        <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 28px auto;">
+        <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 20px auto;">
           <div class="section-tag" style="justify-content: center;">04 // The Edit Process</div>
-          <h2 class="section-title">RAW → FINAL</h2>
+          <h2 class="section-title">RAW <span class="rf-title-arrow">→</span> FINAL</h2>
           <p class="section-subtext"
-            style="margin-top: 12px; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6;">
-            I shape raw footage into compelling visual stories.<br>Through precise editing, motion and color, every
-            frame finds its purpose.
+            style="margin-top: 8px; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.5;">
+            From raw footage to a refined visual experience.
           </p>
         </div>
 
-        <!-- External Labels Outside Video Box -->
-        <div class="rf-external-labels" aria-label="Comparison Labels">
-          <div class="rf-ext-badge rf-ext-raw">
-            <span class="rf-badge-dot raw"></span>
-            <span class="rf-ext-title">RAW FOOTAGE</span>
-          </div>
-          <div class="rf-ext-indicator">
-            <span class="rf-ext-arrow">↔</span>
-            <span class="rf-ext-hint">SLIDE TO COMPARE</span>
-          </div>
-          <div class="rf-ext-badge rf-ext-final">
-            <span class="rf-badge-dot final"></span>
-            <span class="rf-ext-title">FINAL OUTPUT</span>
-          </div>
+        <!-- Minimal Comparison Label Directly Above Video -->
+        <div class="rf-labels-row" aria-label="Comparison Instruction">
+          <span class="rf-label rf-label-center">SLIDE TO COMPARE</span>
         </div>
 
         <!-- Interactive Comparison Stage (Vertical 9:16 Short-Form) -->
@@ -450,7 +481,8 @@
               tabindex="0">
               <div class="rf-divider-line"></div>
               <!-- Round handle with left-right comparison arrows -->
-              <div class="rf-handle-round" id="rf-handle-round" aria-hidden="true" title="Drag left and right to compare">
+              <div class="rf-handle-round" id="rf-handle-round" aria-hidden="true"
+                title="Drag left and right to compare">
                 <div class="rf-handle-stroke-ring"></div>
                 <div class="rf-handle-inner">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -517,29 +549,115 @@
   </main>
 
   <!-- =========================================================================
-       5. FOOTER & CONTACT
+       5. FOOTER & CONTACT (SPACEKEY DIGITAL INSPIRED)
        ========================================================================= -->
   <footer id="contact" class="footer" role="contentinfo">
     <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <h3>Naresh Kumar</h3>
-          <p>Video Editor &amp; Motion Designer</p>
-        </div>
-
-        <ul class="footer-links" aria-label="Social & Contact Links">
-          <li><a href="tel:+919177421780" class="social-link link-phone">+91 9177421780</a></li>
-          <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=nareshkumard009@gmail.com" target="_blank"
-              rel="noopener noreferrer" class="social-link link-email btn-book-me-action"
-              title="Mail via Gmail">Email</a></li>
-          <li><a href="https://www.linkedin.com/in/naresh-kumar-b14a202a1/" target="_blank" rel="noopener noreferrer"
-              class="social-link link-linkedin">LinkedIn</a></li>
-        </ul>
+      <!-- Clean Contact Section Header -->
+      <div class="section-header contact-header"
+        style="text-align: center; max-width: 600px; margin: 0 auto 36px auto;">
+        <div class="section-tag" style="justify-content: center; margin-bottom: 12px;">05 // Contact</div>
+        <h2 class="section-title">Get In Touch</h2>
       </div>
 
+      <!-- High-Impact Direct Contact Cards -->
+      <div class="contact-cards-grid">
+        <!-- 1. Email Card -->
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nareshkumard009@gmail.com" target="_blank"
+          rel="noopener noreferrer" class="direct-contact-card btn-book-me-action link-email" title="Mail via Gmail">
+          <div class="contact-card-icon icon-email">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <div class="contact-card-info">
+            <span class="contact-card-label">Direct Email</span>
+            <span class="contact-card-val">nareshkumard009@gmail.com</span>
+          </div>
+          <div class="contact-card-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- 2. WhatsApp Card -->
+        <a href="https://wa.me/919177421780?text=Hi%20Naresh,%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20connect!"
+          target="_blank" rel="noopener noreferrer" class="direct-contact-card link-whatsapp" title="Chat on WhatsApp">
+          <div class="contact-card-icon icon-whatsapp">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </div>
+          <div class="contact-card-info">
+            <span class="contact-card-label">WhatsApp</span>
+            <span class="contact-card-val">Message me</span>
+          </div>
+          <div class="contact-card-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- 3. Direct Call Card -->
+        <a href="tel:+919177421780" class="direct-contact-card link-phone" title="Call directly">
+          <div class="contact-card-icon icon-phone">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+              </path>
+            </svg>
+          </div>
+          <div class="contact-card-info">
+            <span class="contact-card-label">Direct Call</span>
+            <span class="contact-card-val">+91 9177421780</span>
+          </div>
+          <div class="contact-card-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- 4. LinkedIn Card -->
+        <a href="https://www.linkedin.com/in/naresh-kumar-b14a202a1/" target="_blank" rel="noopener noreferrer"
+          class="direct-contact-card link-linkedin" title="LinkedIn Profile">
+          <div class="contact-card-icon icon-linkedin">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+          </div>
+          <div class="contact-card-info">
+            <span class="contact-card-label">LinkedIn</span>
+            <span class="contact-card-val">Naresh Kumar</span>
+          </div>
+          <div class="contact-card-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      <div class="footer-divider"></div>
+
+      <!-- Clean Bottom Bar -->
       <div class="footer-bottom">
+        <div class="footer-brand-info">
+          <span class="footer-brand-name">Naresh Kumar</span>
+          <span class="footer-dot-sep">·</span>
+          <span class="footer-brand-tag">Video Editor &amp; Motion Designer</span>
+        </div>
+
         <p class="copyright">&copy; 2026 Naresh Kumar. All rights reserved.</p>
-        <span class="footer-location">Hyderabad, India</span>
       </div>
     </div>
   </footer>
@@ -561,22 +679,13 @@
     </div>
   </div>
 
-  <!-- Fluid Gooey Cursor (matching akimafilms.com) -->
-  <svg xmlns="http://www.w3.org/2000/svg" class="goo-filter" aria-hidden="true">
-    <defs>
-      <filter id="goo">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"></feGaussianBlur>
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -15" result="goo">
-        </feColorMatrix>
-        <feComposite in="SourceGraphic" in2="goo" operator="atop"></feComposite>
-      </filter>
-    </defs>
-  </svg>
-  <div id="cursor" class="fluid-cursor" aria-hidden="true"></div>
+  <!-- Custom Cursor & Trailing Ring (inspired by alihossain.com) -->
+  <div id="cursor" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
 
   <!-- Config Data & Scripts -->
-  <script src="js/portfolio-data.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/portfolio-data.js?v=2.6"></script>
+  <script src="js/main.js?v=2.6"></script>
 </body>
 
 </html>
