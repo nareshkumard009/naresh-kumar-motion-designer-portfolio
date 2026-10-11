@@ -712,18 +712,16 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="card-media">
                 <video 
                   class="card-video" 
-                  autoplay 
                   muted 
                   loop 
                   playsinline 
                   preload="metadata"
+                  poster="${item.thumbnail || item.fallbackThumbnail || 'public/thumbnails/placeholder-short.svg'}"
                   disablePictureInPicture
                   disableRemotePlayback
                   data-video-id="${item.id}"
                 >
                   <source src="${item.videoUrl}" type="video/mp4" />
-                  <source src="public/videos/8views -1.mp4" type="video/mp4" />
-                  <source src="public/videos/my show reel.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
 
@@ -731,12 +729,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="card-video-controls" aria-label="Video Controls">
                   <div class="ctrl-btn-group">
                     <!-- Play / Pause -->
-                    <button class="video-ctrl-btn ctrl-play" aria-label="Pause video" title="Play / Pause">
-                      <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <button class="video-ctrl-btn ctrl-play" aria-label="Play video" title="Play / Pause">
+                      <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
                         <rect x="6" y="4" width="4" height="16" rx="1"/>
                         <rect x="14" y="4" width="4" height="16" rx="1"/>
                       </svg>
-                      <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; transform: translateX(1px);">
+                      <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: block; transform: translateX(1px);">
                         <polygon points="6 4 20 12 6 20 6 4"/>
                       </svg>
                     </button>
@@ -782,7 +780,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           `;
         } else {
-          // Long-Form: 16:9 cinematic widescreen cards, automatic muted loop playback with same minimal controls UI
+          // Long-Form: 16:9 cinematic widescreen cards, muted loop playback when visible with minimal controls UI
           return `
             <div 
               class="portfolio-card card-long" 
@@ -794,18 +792,16 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="card-media">
                 <video 
                   class="card-video" 
-                  autoplay 
                   muted 
                   loop 
                   playsinline 
                   preload="metadata"
+                  poster="${item.thumbnail || item.fallbackThumbnail || 'public/thumbnails/placeholder-long.svg'}"
                   disablePictureInPicture
                   disableRemotePlayback
                   data-video-id="${item.id}"
                 >
                   <source src="${item.videoUrl}" type="video/mp4" />
-                  <source src="public/videos/long-01.mp4" type="video/mp4" />
-                  <source src="public/videos/my show reel.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
 
@@ -813,12 +809,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="card-video-controls" aria-label="Video Controls">
                   <div class="ctrl-btn-group">
                     <!-- Play / Pause -->
-                    <button class="video-ctrl-btn ctrl-play" aria-label="Pause video" title="Play / Pause">
-                      <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <button class="video-ctrl-btn ctrl-play" aria-label="Play video" title="Play / Pause">
+                      <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
                         <rect x="6" y="4" width="4" height="16" rx="1"/>
                         <rect x="14" y="4" width="4" height="16" rx="1"/>
                       </svg>
-                      <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; transform: translateX(1px);">
+                      <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: block; transform: translateX(1px);">
                         <polygon points="6 4 20 12 6 20 6 4"/>
                       </svg>
                     </button>
@@ -883,9 +879,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const timeTotal = card.querySelector(".time-total");
 
       if (video) {
-        // Ensure muted autoplay
+        // Start muted and paused; playback is strictly governed by viewport scroll visibility
         video.muted = true;
-        video.play().catch(() => {});
+        video.pause();
 
         // Play / Pause Toggle
         if (playBtn) {
@@ -907,8 +903,10 @@ document.addEventListener("DOMContentLoaded", () => {
           playBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             if (video.paused) {
-              video.play();
+              delete card.dataset.userPaused;
+              video.play().catch(() => {});
             } else {
+              card.dataset.userPaused = "true";
               video.pause();
             }
             updatePlayIcons();
@@ -916,6 +914,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           video.addEventListener("play", updatePlayIcons);
           video.addEventListener("pause", updatePlayIcons);
+          updatePlayIcons();
         }
 
         // Sound On / Off Toggle
@@ -1126,26 +1125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Viewport observer for portfolio card videos: pauses off-screen cards to preserve decoder bandwidth
-    try {
-      if (window.portfolioCardObserver) {
-        window.portfolioCardObserver.disconnect();
-      }
-      window.portfolioCardObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          const v = entry.target;
-          if (entry.isIntersecting) {
-            v.play().catch(() => {});
-          } else {
-            v.pause();
-          }
-        });
-      }, { threshold: 0.1 });
-
-      container.querySelectorAll(".card-video").forEach((v) => {
-        window.portfolioCardObserver.observe(v);
-      });
-    } catch (err) {}
+    // Viewport visibility is managed globally by updatePortfolioCardPlayback()
   };
 
   // Smooth Segmented Tab Switch Pill Positioner
@@ -1221,11 +1201,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Pause outgoing videos
       outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
 
-      // Play visible incoming videos
-      incomingPanel.querySelectorAll(".card-video").forEach((v) => {
-        v.muted = true;
-        v.play().catch(() => {});
-      });
+      // Play only videos in the incoming panel that are currently visible in the viewport
+      schedulePortfolioCardPlayback();
     } else {
       // Long-form glides out to the right
       outgoingPanel.classList.remove("is-active", "is-hidden-left");
@@ -1238,11 +1215,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Pause outgoing videos
       outgoingPanel.querySelectorAll(".card-video").forEach((v) => v.pause());
 
-      // Play visible incoming videos
-      incomingPanel.querySelectorAll(".card-video").forEach((v) => {
-        v.muted = true;
-        v.play().catch(() => {});
-      });
+      // Play only videos in the incoming panel that are currently visible in the viewport
+      schedulePortfolioCardPlayback();
     }
 
     // 4. Update feather overlays
@@ -1252,6 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(trackHeightTimeout);
     trackHeightTimeout = setTimeout(() => {
       panelsTrack.style.height = "auto";
+      schedulePortfolioCardPlayback();
     }, 460);
   };
 
@@ -1324,6 +1299,96 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => updateTabPill(false), 250);
 
   updateFeatherOverlays();
+
+  // ===========================================================================
+  // 4.1 VIEWPORT-AWARE PORTFOLIO VIDEO PLAYBACK CONTROLLER
+  // Only plays card videos when scrolled into view and inside the active tab.
+  // When off-screen, scrolled away, or in an inactive tab, videos strictly pause!
+  // ===========================================================================
+  let cardPlaybackRaf = null;
+
+  const updatePortfolioCardPlayback = () => {
+    if (document.hidden) return;
+
+    const activePanel = document.querySelector(".portfolio-panel.is-active");
+    const inactivePanels = document.querySelectorAll(".portfolio-panel:not(.is-active)");
+
+    // Ensure all videos in inactive panels are strictly paused
+    inactivePanels.forEach((panel) => {
+      panel.querySelectorAll(".card-video").forEach((v) => {
+        if (!v.paused) v.pause();
+      });
+    });
+
+    if (!activePanel) return;
+
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const panelRect = activePanel.getBoundingClientRect();
+
+    // If the active panel is completely outside the viewport vertically, pause all its videos
+    if (panelRect.bottom < 40 || panelRect.top > vh - 40) {
+      activePanel.querySelectorAll(".card-video").forEach((v) => {
+        if (!v.paused) v.pause();
+      });
+      return;
+    }
+
+    const isShortRow = activePanel.classList.contains("grid-short-form");
+    const cards = activePanel.querySelectorAll(".portfolio-card");
+
+    cards.forEach((card) => {
+      const video = card.querySelector(".card-video");
+      if (!video) return;
+
+      // If user manually paused this card, keep it paused
+      if (card.dataset.userPaused === "true") {
+        if (!video.paused) video.pause();
+        return;
+      }
+
+      const rect = card.getBoundingClientRect();
+      const inVerticalView = rect.top < vh - 50 && rect.bottom > 50;
+      let inHorizontalView = rect.left < vw - 20 && rect.right > 20;
+
+      // If in short-form horizontal row, must also be visible inside the horizontal scroll boundaries!
+      if (isShortRow) {
+        inHorizontalView = inHorizontalView && (rect.left < panelRect.right - 25 && rect.right > panelRect.left + 25);
+      }
+
+      if (inVerticalView && inHorizontalView) {
+        if (video.paused) {
+          video.muted = true;
+          const playPromise = video.play();
+          if (playPromise !== undefined) playPromise.catch(() => {});
+        }
+      } else {
+        if (!video.paused) {
+          video.pause();
+        }
+      }
+    });
+  };
+
+  const schedulePortfolioCardPlayback = () => {
+    if (cardPlaybackRaf) return;
+    cardPlaybackRaf = requestAnimationFrame(() => {
+      cardPlaybackRaf = null;
+      updatePortfolioCardPlayback();
+    });
+  };
+
+  // Wire scroll and resize listeners for smooth playback updates
+  window.addEventListener("scroll", schedulePortfolioCardPlayback, { passive: true });
+  window.addEventListener("resize", schedulePortfolioCardPlayback, { passive: true });
+
+  if (gridShort) {
+    gridShort.addEventListener("scroll", schedulePortfolioCardPlayback, { passive: true });
+  }
+
+  // Initial playback check
+  schedulePortfolioCardPlayback();
+  setTimeout(schedulePortfolioCardPlayback, 200);
 
   // ===========================================================================
   // 4.5. RAW → FINAL INTERACTIVE COMPARISON SLIDER (VERTICAL 9:16)
@@ -1419,33 +1484,14 @@ document.addEventListener("DOMContentLoaded", () => {
       rfVideoRaw.pause();
     };
 
-    // Both videos start locked at time 0
-    let rawReady = rfVideoRaw.readyState >= 2;
-    let finalReady = rfVideoFinal.readyState >= 2;
-
-    const startInitialPlayback = () => {
-      if (rawReady && finalReady) {
-        rfVideoRaw.currentTime = 0;
-        rfVideoFinal.currentTime = 0;
-        rfVideoRaw.playbackRate = 1.0;
-        rfVideoFinal.playbackRate = 1.0;
-        playBoth();
-      }
-    };
-
-    rfVideoRaw.addEventListener("loadeddata", () => {
-      rawReady = true;
-      startInitialPlayback();
-    });
-
-    rfVideoFinal.addEventListener("loadeddata", () => {
-      finalReady = true;
-      startInitialPlayback();
-    });
-
-    // Fallback if already ready in memory/cache
-    startInitialPlayback();
-    setTimeout(playBoth, 300);
+    // Both videos start paused and locked at time 0.
+    // Playback is activated strictly when the user scrolls into the RAW -> FINAL section!
+    rfVideoRaw.muted = true;
+    rfVideoFinal.muted = true;
+    rfVideoRaw.pause();
+    rfVideoFinal.pause();
+    rfVideoRaw.currentTime = 0;
+    rfVideoFinal.currentTime = 0;
 
     // Lockstep End & Loop: Master triggers synchronous restart
     const handleLoop = () => {
@@ -1508,9 +1554,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Synchronizes the slave (RAW) to the master (FINAL) using micro-rate adjustments.
     // NEVER touches currentTime during continuous playback! ZERO buffer flushes!
     // =========================================================================
-    const syncVideosLoop = () => {
-      if (!userExplicitlyPaused && !isScrubbingTimeline) {
-        // Keep both playing if master is playing
+    let isRfActiveInView = false;
+
+    const runSyncLoop = () => {
+      if (isRfActiveInView && !userExplicitlyPaused && !isScrubbingTimeline) {
         if (!rfVideoFinal.paused && rfVideoRaw.paused) {
           rfVideoRaw.play().catch(() => {});
         }
@@ -1519,23 +1566,37 @@ document.addEventListener("DOMContentLoaded", () => {
         const absDiff = Math.abs(diff);
 
         if (absDiff > 0.015 && absDiff < 0.6) {
-          // Micro-adjustment: if Raw is ahead (diff > 0), slow down; if behind, speed up
           const rate = Math.min(Math.max(1.0 - (diff * 2.0), 0.75), 1.25);
           rfVideoRaw.playbackRate = rate;
         } else if (absDiff <= 0.015) {
           rfVideoRaw.playbackRate = 1.0;
         } else if (absDiff >= 0.6) {
-          // Discontinuity (e.g. background tab sleep > 1 second):
           if (!rfVideoRaw.seeking && !rfVideoFinal.seeking) {
             rfVideoRaw.currentTime = rfVideoFinal.currentTime;
             rfVideoRaw.playbackRate = 1.0;
           }
         }
       }
-      syncRafId = requestAnimationFrame(syncVideosLoop);
+
+      if (isRfActiveInView && !userExplicitlyPaused) {
+        syncRafId = requestAnimationFrame(runSyncLoop);
+      } else {
+        syncRafId = null;
+      }
     };
 
-    syncVideosLoop();
+    const startSyncLoop = () => {
+      if (!syncRafId && isRfActiveInView && !userExplicitlyPaused) {
+        syncRafId = requestAnimationFrame(runSyncLoop);
+      }
+    };
+
+    const stopSyncLoop = () => {
+      if (syncRafId) {
+        cancelAnimationFrame(syncRafId);
+        syncRafId = null;
+      }
+    };
 
     // =========================================================================
     // Comparison Slider Divider (Vertical Line with Centered Round Handle)
@@ -1696,16 +1757,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (rfPlayBtn) {
       rfPlayBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        if (userExplicitlyPaused) {
+        if (userExplicitlyPaused || (rfVideoFinal.paused && rfVideoRaw.paused)) {
           userExplicitlyPaused = false;
           playBoth();
+          startSyncLoop();
           updatePlayIcons(true);
         } else {
           userExplicitlyPaused = true;
           pauseBoth();
+          stopSyncLoop();
           updatePlayIcons(false);
         }
       });
+      // Initial state is paused with play icon
+      updatePlayIcons(false);
     }
 
     // Overall Volume Control (Volume button beside pause button controls master audio)
@@ -1853,21 +1918,56 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Viewport IntersectionObserver to start/resume playback when user scrolls into view,
-    // and pause when scrolled away to save hardware video decoder bandwidth!
+    // Viewport IntersectionObserver to play RAW -> FINAL strictly when user scrolls into view,
+    // and immediately pause when scrolled away to completely free hardware decoders and CPU sync loops!
     try {
       const stageObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (!userExplicitlyPaused) playBoth();
+            isRfActiveInView = true;
+            if (!userExplicitlyPaused) {
+              playBoth();
+              startSyncLoop();
+              updatePlayIcons(true);
+            }
           } else {
-            // When scrolled off-screen, pause both comparison videos to free hardware decoders
+            isRfActiveInView = false;
             pauseBoth();
+            stopSyncLoop();
+            updatePlayIcons(false);
           }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.15 });
       stageObserver.observe(rfStage);
     } catch (e) {}
+
+    // Expose global hooks for modal close & page visibility
+    window.checkRfVisibility = () => {
+      if (!rfStage) return;
+      const rect = rfStage.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const inView = rect.bottom > 80 && rect.top < vh - 80;
+      if (inView) {
+        isRfActiveInView = true;
+        if (!userExplicitlyPaused) {
+          playBoth();
+          startSyncLoop();
+          updatePlayIcons(true);
+        }
+      } else {
+        isRfActiveInView = false;
+        pauseBoth();
+        stopSyncLoop();
+        updatePlayIcons(false);
+      }
+    };
+
+    window.stopRfComparison = () => {
+      isRfActiveInView = false;
+      pauseBoth();
+      stopSyncLoop();
+      updatePlayIcons(false);
+    };
   };
 
   // Initialize RAW → FINAL Comparison Slider
@@ -2409,32 +2509,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 3. Resume inline looping videos in active panel (portfolio cards and raw-final)
+    // 3. Resume inline videos strictly based on current viewport visibility!
     if (activeModalProject && activeModalProject.id === "showreel" && showreelVideo) {
-      showreelVideo.play().catch(() => {});
+      const heroEl = document.getElementById("hero");
+      const heroRect = heroEl ? heroEl.getBoundingClientRect() : null;
+      if (heroRect && heroRect.bottom > 100 && heroRect.top < window.innerHeight - 100) {
+        showreelVideo.play().catch(() => {});
+      }
     }
-    const activePanel = document.querySelector(".portfolio-panel.is-active");
-    if (activePanel) {
-      activePanel.querySelectorAll(".card-video").forEach((v) => {
-        if (v.paused) {
-          v.muted = true;
-          v.play().catch(() => {});
-        }
-      });
+
+    if (typeof schedulePortfolioCardPlayback === "function") {
+      schedulePortfolioCardPlayback();
     }
-    const rfVidRaw = document.getElementById("rf-video-raw");
-    const rfVidFinal = document.getElementById("rf-video-final");
-    if (rfVidRaw && rfVidRaw.paused) {
-      rfVidRaw.play().catch(() => {});
-    }
-    if (rfVidFinal && rfVidFinal.paused) {
-      rfVidFinal.play().catch(() => {});
-    }
-    if (typeof window.muteRawFinalComparison === "function") {
-      window.muteRawFinalComparison();
-    } else {
-      if (rfVidRaw) rfVidRaw.muted = true;
-      if (rfVidFinal) rfVidFinal.muted = true;
+
+    if (typeof window.checkRfVisibility === "function") {
+      window.checkRfVisibility();
     }
 
     // 4. Clear container after transition completes so fade-out is seamless
@@ -2491,6 +2580,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // Expose globally for testing or manual triggers
   window.openVideoModal = openVideoModal;
   window.closeVideoModal = closeVideoModal;
+
+  // ===========================================================================
+  // 5.5 PAGE VISIBILITY API (HALT ALL BACKGROUND PLAYBACK & CPU CYCLES)
+  // ===========================================================================
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      // Background tab: immediately pause all playing videos to preserve battery & CPU
+      document.querySelectorAll("video").forEach((v) => {
+        if (!v.paused) v.pause();
+      });
+      if (typeof window.stopRfComparison === "function") {
+        window.stopRfComparison();
+      }
+    } else {
+      // Foreground tab: resume strictly what is currently visible in the active viewport
+      if (typeof schedulePortfolioCardPlayback === "function") {
+        schedulePortfolioCardPlayback();
+      }
+      if (typeof window.checkRfVisibility === "function") {
+        window.checkRfVisibility();
+      }
+    }
+  });
 
   // ===========================================================================
   // 6. DIRECT CONTACT (BLANK GMAIL COMPOSE, PHONE & SOCIAL LINKS)

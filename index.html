@@ -142,7 +142,7 @@
         <div class="showreel-wrapper">
           <div class="showreel-frame" id="showreel-frame" role="region" aria-label="Naresh Kumar Showreel">
             <!-- Native Showreel Video (Paused with Poster Thumbnail) -->
-            <video id="showreel-video" class="showreel-video" muted loop playsinline preload="auto"
+            <video id="showreel-video" class="showreel-video" muted loop playsinline preload="metadata"
               poster="public/thumbnails/showreel-poster.jpg" disablePictureInPicture disableRemotePlayback>
               <source src="public/videos/showreel.mp4" type="video/mp4" />
               Your browser does not support the video tag.
@@ -458,7 +458,7 @@
             <div class="rf-video-window" id="rf-video-window">
               <!-- RAW FOOTAGE Layer (Base Layer) -->
               <div class="rf-layer rf-layer-raw" id="rf-layer-raw" aria-hidden="false">
-                <video id="rf-video-raw" class="rf-video rf-video-raw" muted playsinline preload="auto"
+                <video id="rf-video-raw" class="rf-video rf-video-raw" muted playsinline preload="metadata"
                   disablePictureInPicture disableRemotePlayback>
                   <source src="public/videos/raw video.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -467,7 +467,7 @@
 
               <!-- FINAL OUTPUT Layer (Clipped Top Layer) -->
               <div class="rf-layer rf-layer-final" id="rf-layer-final" aria-hidden="false">
-                <video id="rf-video-final" class="rf-video rf-video-final" muted playsinline preload="auto"
+                <video id="rf-video-final" class="rf-video rf-video-final" muted playsinline preload="metadata"
                   disablePictureInPicture disableRemotePlayback>
                   <source src="public/videos/final output.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -498,14 +498,15 @@
             <div class="card-video-controls rf-controls" id="rf-controls" aria-label="Comparison Video Controls">
               <div class="ctrl-btn-group">
                 <!-- Play / Pause -->
-                <button class="video-ctrl-btn ctrl-play" id="rf-ctrl-play" aria-label="Pause comparison"
+                <button class="video-ctrl-btn ctrl-play" id="rf-ctrl-play" aria-label="Play comparison"
                   title="Play / Pause">
-                  <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"
+                    style="display: none;">
                     <rect x="6" y="4" width="4" height="16" rx="1" />
                     <rect x="14" y="4" width="4" height="16" rx="1" />
                   </svg>
                   <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"
-                    style="display: none; transform: translateX(1px);">
+                    style="display: block; transform: translateX(1px);">
                     <polygon points="6 4 20 12 6 20 6 4" />
                   </svg>
                 </button>
