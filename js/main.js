@@ -305,7 +305,10 @@ document.addEventListener("DOMContentLoaded", () => {
           if (iconPause) iconPause.style.display = "none";
           if (iconPlay) iconPlay.style.display = "block";
           if (showreelPlayBtn) showreelPlayBtn.setAttribute("aria-label", "Play showreel");
-          if (showreelFrame) showreelFrame.classList.remove("is-playing");
+          if (showreelFrame) {
+            showreelFrame.classList.remove("is-playing");
+            showreelFrame.classList.remove("controls-hidden");
+          }
         } else {
           if (iconPause) iconPause.style.display = "block";
           if (iconPlay) iconPlay.style.display = "none";
@@ -522,6 +525,10 @@ document.addEventListener("DOMContentLoaded", () => {
           showreelFrame.classList.add("is-fullscreen");
           resetInactivityTimer();
         }
+
+        if (window.syncCustomCursor) {
+          window.syncCustomCursor();
+        }
       };
 
       const toggleFullscreen = (e) => {
@@ -571,6 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Inactivity autohide / wake in fullscreen
       showreelFrame.addEventListener("mousemove", resetInactivityTimer);
+      showreelFrame.addEventListener("pointermove", resetInactivityTimer, { passive: true });
       showreelFrame.addEventListener("touchstart", resetInactivityTimer, { passive: true });
 
       // Double-click on showreel frame toggles fullscreen
@@ -2046,6 +2054,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const ytId = getYouTubeId(candidateUrl);
     const vimeoId = getVimeoId(candidateUrl);
 
+    // Safeguard: move custom cursor to document.body before re-rendering modalContainer
+    const customCursor = document.getElementById("cursor");
+    const customRing = document.getElementById("cursor-ring");
+    if (customCursor && customCursor.parentElement === modalContainer) document.body.appendChild(customCursor);
+    if (customRing && customRing.parentElement === modalContainer) document.body.appendChild(customRing);
+
     // Render video player or embed with guaranteed autoplay
     if (ytId) {
       modalContainer.innerHTML = `
@@ -2193,6 +2207,9 @@ document.addEventListener("DOMContentLoaded", () => {
           const isPaused = modalVid.paused;
           if (modalContainer) {
             modalContainer.classList.toggle("is-playing", !isPaused);
+            if (isPaused) {
+              modalContainer.classList.remove("controls-hidden");
+            }
           }
           if (modalPlayBtn) {
             const pPause = modalPlayBtn.querySelector(".icon-pause");
@@ -2375,6 +2392,10 @@ document.addEventListener("DOMContentLoaded", () => {
             modalContainer.classList.add("is-fullscreen");
             resetModalInactivity();
           }
+
+          if (window.syncCustomCursor) {
+            window.syncCustomCursor();
+          }
         };
 
         const toggleModalFullscreen = (e) => {
@@ -2416,6 +2437,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (modalFullscreenBtn) modalFullscreenBtn.addEventListener("click", toggleModalFullscreen);
 
         modalContainer.addEventListener("mousemove", resetModalInactivity);
+        modalContainer.addEventListener("pointermove", resetModalInactivity, { passive: true });
         modalContainer.addEventListener("touchstart", resetModalInactivity, { passive: true });
 
         // Double-click on video toggles fullscreen
@@ -2486,6 +2508,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (modalContainer) {
       modalContainer.classList.remove("is-fullscreen", "controls-hidden", "is-playing");
+    }
+    if (window.syncCustomCursor) {
+      window.syncCustomCursor();
     }
 
     // 1. Immediately pause and mute any video or audio in modal
@@ -2697,11 +2722,57 @@ document.addEventListener("DOMContentLoaded", () => {
     let isVisible = false;
     let isHovering = false;
 
+    // Detect active fullscreen container (HTML5 Fullscreen API or class fallback)
+    const getActiveFullscreenElement = () => {
+      return (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement ||
+        document.querySelector('.modal-video-container.is-fullscreen') ||
+        document.querySelector('.showreel-frame.is-fullscreen') ||
+        null
+      );
+    };
+
+    // Ensure cursor and trailing ring reside in the active fullscreen DOM layer
+    // (HTML5 Fullscreen API strictly isolates elements outside the fullscreen element)
+    const syncCursorParent = () => {
+      const activeFs = getActiveFullscreenElement();
+      const targetContainer = activeFs || document.body;
+
+      if (cursor && cursor.parentElement !== targetContainer) {
+        targetContainer.appendChild(cursor);
+      }
+      if (ring && ring.parentElement !== targetContainer) {
+        targetContainer.appendChild(ring);
+      }
+
+      if (mx > -50 && my > -50) {
+        cursor.style.left = mx + 'px';
+        cursor.style.top = my + 'px';
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        cursor.classList.add('cursor-visible');
+        ring.classList.add('cursor-visible');
+      }
+    };
+
+    window.syncCustomCursor = syncCursorParent;
+
     // Direct cursor updater exposed globally so slider and dragging gestures feed coordinates seamlessly
     const updateCursorPos = (clientX, clientY) => {
       if (typeof clientX !== 'number' || typeof clientY !== 'number' || isNaN(clientX) || isNaN(clientY)) return;
       mx = clientX;
       my = clientY;
+
+      // Keep cursor element inside whichever container (fullscreen or body) is currently active
+      const activeFs = getActiveFullscreenElement();
+      const targetContainer = activeFs || document.body;
+      if (cursor.parentElement !== targetContainer) {
+        targetContainer.appendChild(cursor);
+        targetContainer.appendChild(ring);
+      }
 
       if (!isVisible) {
         isVisible = true;
@@ -2717,16 +2788,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.updateCustomCursor = updateCursorPos;
 
-    // Follow pointer position instantly across all input and dragging events
+    // Listen to Fullscreen API changes immediately
+    document.addEventListener('fullscreenchange', syncCursorParent);
+    document.addEventListener('webkitfullscreenchange', syncCursorParent);
+    document.addEventListener('mozfullscreenchange', syncCursorParent);
+    document.addEventListener('MSFullscreenChange', syncCursorParent);
+
+    // Follow pointer position instantly across all input and dragging events (using capture to avoid any blocking)
     const onPointerMove = (e) => {
       updateCursorPos(e.clientX, e.clientY);
     };
 
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('mousemove', onPointerMove, { passive: true });
-    document.addEventListener('pointermove', onPointerMove, { passive: true });
-    document.addEventListener('mousemove', onPointerMove, { passive: true });
-    window.addEventListener('dragover', onPointerMove, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
+    window.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
+    document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
+    document.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
+    window.addEventListener('dragover', onPointerMove, { passive: true, capture: true });
 
     // Smooth lerp easing for trailing outer ring (0.12 factor matching alihossain.com)
     const animRing = () => {
@@ -2744,10 +2821,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Interactive element hover detection (event delegation handles all current & dynamic nodes)
     const interactiveSelector =
       'a, button, [role="button"], [role="slider"], input, textarea, select, ' +
-      '.filter-chip, .tab-btn, .portfolio-card, .video-card, .showreel-frame, ' +
-      '.carousel-btn, .modal-close-floating, .brand-logo, .nav-link, .cta-button, ' +
-      '.theme-toggle, .contact-method-card, label[for], .rf-stage, .rf-divider-vertical, ' +
-      '.rf-handle-round, .rf-video-window, .ctrl-timeline-wrap, [data-cursor="hover"]';
+      '.filter-chip, .tab-btn, .portfolio-card, .video-card, ' +
+      '.showreel-frame:not(:fullscreen):not(.is-fullscreen), ' +
+      '.showreel-big-play, .modal-big-play, .video-ctrl-btn, .ctrl-timeline-wrap, ' +
+      '.volume-slider-wrap, .carousel-btn, .modal-close-floating, .modal-close-btn, ' +
+      '.brand-logo, .nav-link, .cta-button, .theme-toggle, .contact-method-card, label[for], ' +
+      '.rf-stage, .rf-divider-vertical, .rf-handle-round, .rf-video-window, [data-cursor="hover"]';
 
     document.addEventListener('mouseover', (e) => {
       if (e.target && e.target.closest(interactiveSelector)) {
@@ -2775,23 +2854,23 @@ document.addEventListener("DOMContentLoaded", () => {
       updateCursorPos(e.clientX, e.clientY);
       cursor.classList.add('cursor-clicking');
       ring.classList.add('cursor-clicking');
-    }, { passive: true });
+    }, { passive: true, capture: true });
 
     document.addEventListener('pointerup', () => {
       cursor.classList.remove('cursor-clicking');
       ring.classList.remove('cursor-clicking');
-    }, { passive: true });
+    }, { passive: true, capture: true });
 
     document.addEventListener('mousedown', (e) => {
       updateCursorPos(e.clientX, e.clientY);
       cursor.classList.add('cursor-clicking');
       ring.classList.add('cursor-clicking');
-    }, { passive: true });
+    }, { passive: true, capture: true });
 
     document.addEventListener('mouseup', () => {
       cursor.classList.remove('cursor-clicking');
       ring.classList.remove('cursor-clicking');
-    }, { passive: true });
+    }, { passive: true, capture: true });
 
     // Viewport enter / leave listeners
     document.addEventListener('mouseleave', () => {

@@ -1029,8 +1029,6 @@ html.hero-done .showreel-wrapper::before {
 /* Showreel Fullscreen Styles (Preserves all UI: Volume, Play/Pause, Timeline in Fullscreen) */
 .showreel-frame:fullscreen,
 .showreel-frame:-webkit-full-screen,
-.showreel-frame:-moz-full-screen,
-.showreel-frame:-ms-fullscreen,
 .showreel-frame.is-fullscreen {
   position: fixed !important;
   inset: 0 !important;
@@ -1049,13 +1047,10 @@ html.hero-done .showreel-wrapper::before {
   justify-content: center !important;
   overflow: hidden !important;
   z-index: 999999 !important;
-  cursor: default !important;
 }
 
 .showreel-frame:fullscreen .showreel-video,
 .showreel-frame:-webkit-full-screen .showreel-video,
-.showreel-frame:-moz-full-screen .showreel-video,
-.showreel-frame:-ms-fullscreen .showreel-video,
 .showreel-frame.is-fullscreen .showreel-video {
   width: 100% !important;
   height: 100% !important;
@@ -1068,8 +1063,6 @@ html.hero-done .showreel-wrapper::before {
 /* Fullscreen Controls Bar — Polished Glass Toolbar */
 .showreel-frame:fullscreen .card-video-controls,
 .showreel-frame:-webkit-full-screen .card-video-controls,
-.showreel-frame:-moz-full-screen .card-video-controls,
-.showreel-frame:-ms-fullscreen .card-video-controls,
 .showreel-frame.is-fullscreen .card-video-controls {
   position: absolute !important;
   bottom: 28px !important;
@@ -1085,15 +1078,13 @@ html.hero-done .showreel-wrapper::before {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.2) !important;
   opacity: 1 !important;
   visibility: visible !important;
-  z-index: 2147483647 !important;
+  z-index: 2147483640 !important;
   transition: opacity 0.3s ease, visibility 0.3s ease !important;
 }
 
 /* Auto-hide controls in fullscreen after inactivity */
 .showreel-frame:fullscreen.controls-hidden .card-video-controls,
 .showreel-frame:-webkit-full-screen.controls-hidden .card-video-controls,
-.showreel-frame:-moz-full-screen.controls-hidden .card-video-controls,
-.showreel-frame:-ms-fullscreen.controls-hidden .card-video-controls,
 .showreel-frame.is-fullscreen.controls-hidden .card-video-controls {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -2619,7 +2610,6 @@ body.modal-open .footer {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  cursor: pointer !important;
   transition: transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast) !important;
 }
 
@@ -2740,8 +2730,6 @@ body.modal-open .footer {
 /* Modal Video Container Fullscreen Styles */
 .modal-video-container:fullscreen,
 .modal-video-container:-webkit-full-screen,
-.modal-video-container:-moz-full-screen,
-.modal-video-container:-ms-fullscreen,
 .modal-video-container.is-fullscreen {
   position: fixed !important;
   inset: 0 !important;
@@ -2760,13 +2748,10 @@ body.modal-open .footer {
   justify-content: center !important;
   overflow: hidden !important;
   z-index: 2147483647 !important;
-  cursor: default !important;
 }
 
 .modal-video-container:fullscreen .modal-video-player,
 .modal-video-container:-webkit-full-screen .modal-video-player,
-.modal-video-container:-moz-full-screen .modal-video-player,
-.modal-video-container:-ms-fullscreen .modal-video-player,
 .modal-video-container.is-fullscreen .modal-video-player {
   width: 100% !important;
   height: 100% !important;
@@ -2779,8 +2764,6 @@ body.modal-open .footer {
 /* Fullscreen Controls Bar */
 .modal-video-container:fullscreen .modal-video-controls,
 .modal-video-container:-webkit-full-screen .modal-video-controls,
-.modal-video-container:-moz-full-screen .modal-video-controls,
-.modal-video-container:-ms-fullscreen .modal-video-controls,
 .modal-video-container.is-fullscreen .modal-video-controls {
   position: absolute !important;
   bottom: 28px !important;
@@ -2797,15 +2780,13 @@ body.modal-open .footer {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.2) !important;
   opacity: 1 !important;
   visibility: visible !important;
-  z-index: 2147483647 !important;
+  z-index: 2147483640 !important;
   transition: opacity 0.3s ease, visibility 0.3s ease !important;
 }
 
 /* Auto-hide controls in fullscreen after inactivity */
 .modal-video-container:fullscreen.controls-hidden .modal-video-controls,
 .modal-video-container:-webkit-full-screen.controls-hidden .modal-video-controls,
-.modal-video-container:-moz-full-screen.controls-hidden .modal-video-controls,
-.modal-video-container:-ms-fullscreen.controls-hidden .modal-video-controls,
 .modal-video-container.is-fullscreen.controls-hidden .modal-video-controls {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -2852,7 +2833,7 @@ body.modal-open .footer {
 .modal-video-container:fullscreen .modal-big-play,
 .modal-video-container:-webkit-full-screen .modal-big-play,
 .modal-video-container.is-fullscreen .modal-big-play {
-  z-index: 2147483646 !important;
+  z-index: 2147483630 !important;
   width: 90px !important;
   height: 90px !important;
 }
@@ -3664,48 +3645,23 @@ body.modal-open .footer {
    Interactive dot + lerp-eased outer ring styled with website colors
    ============================================================================= */
 @media (pointer: fine) {
+  /* Complete suppression of native OS browser cursor everywhere — whether fullscreen or not */
+  *,
+  *::before,
+  *::after,
+  html,
   body {
-    cursor: none;
-  }
-
-  a,
-  button,
-  [role="button"],
-  [role="slider"],
-  .filter-chip,
-  .tab-btn,
-  .portfolio-card,
-  .video-card,
-  .showreel-frame,
-  .carousel-btn,
-  .modal-close-floating,
-  .brand-logo,
-  .nav-link,
-  .cta-button,
-  .theme-toggle,
-  .contact-method-card,
-  label[for],
-  .rf-stage,
-  .rf-stage *,
-  .rf-divider-vertical,
-  .rf-handle-round,
-  .rf-handle-inner,
-  .rf-video-window,
-  .ctrl-timeline-wrap,
-  .ctrl-timeline-wrap * {
     cursor: none !important;
   }
 
-  .rf-stage.is-dragging,
-  .rf-stage.is-dragging *,
-  .ctrl-timeline-wrap.is-dragging,
-  .ctrl-timeline-wrap.is-dragging * {
+  :fullscreen,
+  :fullscreen * {
     cursor: none !important;
   }
 
-  input,
-  textarea {
-    cursor: text;
+  :-webkit-full-screen,
+  :-webkit-full-screen * {
+    cursor: none !important;
   }
 
   #cursor {
@@ -3716,9 +3672,9 @@ body.modal-open .footer {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 999999;
-    pointer-events: none;
-    user-select: none;
+    z-index: 2147483647 !important;
+    pointer-events: none !important;
+    user-select: none !important;
     transform: translate(-50%, -50%);
     opacity: 0;
     will-change: left, top, width, height, background-color, transform;
@@ -3740,9 +3696,9 @@ body.modal-open .footer {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 999998;
-    pointer-events: none;
-    user-select: none;
+    z-index: 2147483646 !important;
+    pointer-events: none !important;
+    user-select: none !important;
     transform: translate(-50%, -50%);
     opacity: 0;
     will-change: left, top, width, height, border-color, background-color, transform;
@@ -3760,6 +3716,13 @@ body.modal-open .footer {
   #cursor.cursor-visible,
   #cursor-ring.cursor-visible {
     opacity: 1;
+  }
+
+  /* Fullscreen inactivity autohide: fade custom cursor smoothly when controls hide */
+  .controls-hidden #cursor,
+  .controls-hidden #cursor-ring {
+    opacity: 0 !important;
+    transition: opacity 0.35s ease !important;
   }
 
   /* Hover Expansion on Interactive Elements */
