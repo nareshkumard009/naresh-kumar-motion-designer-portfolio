@@ -49,8 +49,8 @@ const portfolioData = {
   // ---------------------------------------------------------------------------
   stats: [
     { value: 2, suffix: "+", label: "Years Experience" },
-    { value: 25, suffix: "+", label: "Brands" },
-    { value: 300, suffix: "+", label: "Videos Edited" }
+    { value: 30, suffix: "+", label: "Brands" },
+    { value: 350, suffix: "+", label: "Videos Edited" }
   ],
 
   // ---------------------------------------------------------------------------
